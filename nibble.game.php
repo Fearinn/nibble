@@ -81,7 +81,7 @@ class Nibble extends Table
             return true;
         }
 
-        function placeDiscs(&$board, $colors, $row = 0, $col = 0): bool
+        function placeDiscs(&$board, &$colorCounts, $colors, $row = 0, $col = 0): bool
         {
             $rows = count($board);
             $cols = count($board[0]);
@@ -98,14 +98,16 @@ class Nibble extends Table
             shuffle($colors);
 
             foreach ($colors as $color) {
-                if (isSafe($board, $row, $col, $color)) {
+                if (isSafe($board, $row, $col, $color) && $colorCounts[$color] < 9) {
                     $board[$row][$col] = $color;
+                    $colorCounts[$color]++;
 
-                    if (placeDiscs($board, $colors, $nextRow, $nextCol)) {
+                    if (placeDiscs($board, $colorCounts, $colors, $nextRow, $nextCol)) {
                         return true; // Placement is successful
                     }
 
                     $board[$row][$col] = null; // Backtrack
+                    $colorCounts[$color]--;
                 }
             }
 
@@ -115,13 +117,12 @@ class Nibble extends Table
         function initializeBoard($size, $numColors)
         {
             $board = array_fill(0, $size, array_fill(0, $size, null));
-
             $colors = range(1, $numColors); // Represent colors as numbers (1, 2, 3, ..., 9)
+            $colorCounts = array_fill(1, $numColors, 0); // Initialize color counts
 
             // Attempt to place discs on the board
-            if (!placeDiscs($board, $colors)) {
-                throw new BgaSystemException("Failed to place discs in the board");
-                return null;
+            if (!placeDiscs($board, $colorCounts, $colors)) {
+                throw new BgaVisibleSystemException("Failed to place discs in the board");
             }
 
             return $board;
