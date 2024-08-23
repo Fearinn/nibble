@@ -20,12 +20,15 @@ define([
   "dojo/_base/declare",
   "ebg/core/gamegui",
   "ebg/counter",
+  `${g_gamethemeurl}modules/bga-cards.js`,
 ], function (dojo, declare) {
   return declare("bgagame.nibble", ebg.core.gamegui, {
     constructor: function () {
       console.log("nibble constructor");
 
       this.nibGlobals = {};
+      this.nibCardsManagers = {};
+      this.nibStocks = {};
 
       this.nibGlobals.colors = {
         1: "green",
@@ -38,6 +41,20 @@ define([
         8: "gray",
         9: "black",
       };
+
+      this.nibCardsManagers.board = new CardManager(this, {
+        cardHeight: 60,
+        cardWidth: 60,
+        selectedCardClass: "prs_selected",
+        getId: (card) => `disc-${card.row}${card.column}`,
+        setupDiv: (card, div) => {
+          div.classList.add("nib_disc");
+          div.style.backgroundColor = this.nibGlobals.colors[card.colorId];
+          div.style.position = "relative";
+        },
+        setupFrontDiv: (card, div) => {},
+        setupBackDiv: (card, div) => {},
+      });
     },
 
     setup: function (gamedatas) {
@@ -47,15 +64,25 @@ define([
 
       const boardElement = document.getElementById("nib_board");
 
+      this.nibStocks.board = new CardStock(
+        this.nibCardsManagers.board,
+        boardElement,
+        {}
+      );
+
       let rowId = 1;
       let columnId = 1;
       this.nibGlobals.board.forEach((row) => {
         row.forEach((colorId) => {
-          const gridPos = `${rowId}${columnId}`;
           columnId++;
 
-          const color = this.nibGlobals.colors[colorId];
-          boardElement.innerHTML += `<div id=board-${gridPos} class="nib_disc" style="background-color: ${color}"></div>`;
+          const card = {
+            row: rowId,
+            column: columnId,
+            colorId: colorId,
+          };
+
+          this.nibStocks.board.addCard(card);
         });
 
         rowId++;

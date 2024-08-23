@@ -114,7 +114,7 @@ class Nibble extends Table
             return false; // No valid placement found
         }
 
-        function initializeBoard($size, $numColors)
+        function initializeBoard($size, $numColors): array
         {
             $board = array_fill(0, $size, array_fill(0, $size, null));
             $colors = range(1, $numColors); // Represent colors as numbers (1, 2, 3, ..., 9)
@@ -159,7 +159,7 @@ class Nibble extends Table
         $sql = "SELECT player_id id, player_score score FROM player";
         $result = array(
             "players" => $this->getCollectionFromDb($sql),
-            "board" => $this->globals->get("board")
+            "board" => $this->globals->get("board"),
         );
 
         return $result;
