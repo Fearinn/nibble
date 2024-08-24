@@ -56,7 +56,7 @@ class Nibble extends Table
 
         /************ Start the game initialization *****/
 
-        function isSafe($board, $row, $col, $color): bool
+        function isSafeColor($board, $row, $col, $color): bool
         {
             // Check the orthogonal neighbors (up, down, left, right)
             $rows = count($board);
@@ -98,7 +98,7 @@ class Nibble extends Table
             shuffle($colors);
 
             foreach ($colors as $color) {
-                if (isSafe($board, $row, $col, $color) && $colorCounts[$color] < 9) {
+                if (isSafeColor($board, $row, $col, $color) && $colorCounts[$color] < 9) {
                     $board[$row][$col] = $color;
                     $colorCounts[$color]++;
 
@@ -160,6 +160,7 @@ class Nibble extends Table
         $result = array(
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
+            "legalMoves" => $this->globals->get("legalMoves", $this->calcLegalMoves()),
         );
 
         return $result;
@@ -175,21 +176,183 @@ class Nibble extends Table
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Utility functions
-    ////////////    
+    //////////// 
+
+    function calcLegalMoves()
+    {
+        $legalMoves = array();
+
+        $board = $this->globals->get("board");
+        $activeColor = $this->globals->get("activeColor");
+
+        foreach ($board as $rowId => $row) {
+            foreach ($row as $columnId => $color) {
+                if ($this->isMoveLegal($board, $rowId, $columnId, $activeColor)) {
+                    $legalMoves[] = array("row" => $rowId, "column" => $columnId);
+                };
+            }
+        }
+
+        if ($this->globals->get("legalMoves") === null) {
+            $this->globals->set("legalMoves", $legalMoves);
+        }
+
+        return $legalMoves;
+    }
+
+
+    function isMoveLegal(array $board, int $x, int $y, $activeColor)
+    {
+        $color = $board[$x][$y];
+
+        if ($activeColor && $color != $activeColor) {
+            return false;
+        }
+
+        if (!$this->isSafeNeighbor($board, $x, $y)) {
+            return false;
+        }
+
+        // Copy the board
+        $tempBoard = $board;
+        // Remove the disc
+        $tempBoard[$x][$y] = null;
+
+        // Check connectivity
+        $components = $this->findConnectedComponents($tempBoard);
+
+        // If more than one component is found, the move is illegal
+        return count($components) === 1;
+    }
+
+    function isSafeNeighbor(array $board, int $row, int $col)
+    {
+        // Check the orthogonal neighbors (up, down, left, right)
+        $rows = count($board);
+        $cols = count($board[0]);
+
+        $openNeighbors = 4;
+
+        if ($row > 0 && $board[$row - 1][$col] !== null) {
+            $openNeighbors--;
+        } // Up
+
+        if ($row < $rows - 1 && $board[$row + 1][$col] !== null) {
+            $openNeighbors--;
+        } // Down
+
+        if ($col > 0 && $board[$row][$col - 1] !== null) {
+            $openNeighbors--;
+        } // Left
+
+        if ($col < $cols - 1 && $board[$row][$col + 1] !== null) {
+            $openNeighbors--;
+        } // Right
+
+        if ($row == 0 && $col == 0) {
+            $this->dump("neighbors", $openNeighbors);
+            return true;
+        }
+
+        return $openNeighbors >= 2;
+    }
+
+    function findConnectedComponents($board)
+    {
+        $visited = [];
+        $components = [];
+
+        foreach ($board as $x => $row) {
+            foreach ($row as $y => $disc) {
+                if ($disc !== null && !isset($visited["$x,$y"])) {
+                    // Start a new component
+                    $component = [];
+                    $this->floodFill($board, $x, $y, $visited, $component);
+                    $components[] = $component;
+                }
+            }
+        }
+
+        return $components;
+    }
+
+    function floodFill($board, $x, $y, &$visited, &$component)
+    {
+        $stack = [[$x, $y]];
+
+        while (!empty($stack)) {
+            list($cx, $cy) = array_pop($stack);
+
+            if (!isset($visited["$cx,$cy"]) && $board[$cx][$cy] !== null) {
+                $visited["$cx,$cy"] = true;
+                $component[] = [$cx, $cy];
+
+                // Add orthogonal neighbors to the stack
+                $neighbors = [
+                    [$cx - 1, $cy],
+                    [$cx + 1, $cy],
+                    [$cx, $cy - 1],
+                    [$cx, $cy + 1]
+                ];
+
+                foreach ($neighbors as $neighbor) {
+                    list($nx, $ny) = $neighbor;
+                    if (isset($board[$nx][$ny]) && $board[$nx][$ny] !== null) {
+                        $stack[] = $neighbor;
+                    }
+                }
+            }
+        }
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
+
+    function takeDisc(array $disc)
+    {
+        $board = $this->globals->get("board");
+
+        $legalMoves = $this->globals->get("legalMoves");
+
+        if (!in_array($disc, $legalMoves)) {
+            throw new BgaVisibleSystemException("You can't take this disc");
+        }
+
+        $disc_row = $disc["row"];
+        $disc_column = $disc["column"];
+
+
+        $board[$disc_row][$disc_column] = null;
+
+        $this->globals->set("board", $board);
+        $this->globals->set("activeColor", $disc["colorId"]);
+    }
 
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state arguments
     ////////////
 
+    function argPlayerTurn()
+    {
+        return array(
+            "legalMoves" => $this->globals->get("legalMoves"),
+        );
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
     ////////////
+
+    function st_betweenTurns()
+    {
+        $legalMoves = $this->calcLegalMoves();
+
+        $this->globals->set("legalMoves", $legalMoves);
+
+        $this->gamestate->nextState("playerTurn");
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie

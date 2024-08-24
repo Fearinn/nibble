@@ -15,6 +15,10 @@
 
 @import url("modules/bga-cards.css");
 
+.nib_gameArea div {
+  box-sizing: border-box;
+}
+
 .nib_board {
   display: grid;
   grid-template-rows: repeat(9, 60px);
@@ -30,6 +34,10 @@
   aspect-ratio: 1;
   border-radius: 100%;
   width: 60px;
+}
+
+.nib_selectedDisc {
+  border: 4px dashed black;
 }
 
 .nib_disc div {

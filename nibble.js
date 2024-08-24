@@ -31,12 +31,12 @@ define([
       this.nibStocks = {};
 
       this.nibGlobals.colors = {
-        1: "green",
+        1: "lightgreen",
         2: "purple",
         3: "red",
         4: "yellow",
         5: "orange",
-        6: "blue",
+        6: "lightblue",
         7: "white",
         8: "gray",
         9: "black",
@@ -45,7 +45,7 @@ define([
       this.nibCardsManagers.board = new CardManager(this, {
         cardHeight: 60,
         cardWidth: 60,
-        selectedCardClass: "prs_selected",
+        selectedCardClass: "nib_selectedDisc",
         getId: (card) => `disc-${card.row}${card.column}`,
         setupDiv: (card, div) => {
           div.classList.add("nib_disc");
@@ -70,17 +70,35 @@ define([
         {}
       );
 
-      let rowId = 1;
-      let columnId = 1;
+      this.nibStocks.board.setSelectionMode("single");
+
+      this.nibStocks.board.onSelectionChange = (selection, lastChange) => {
+        const confirmBtn = document.getElementById("nib_confirmBtn");
+
+        if (confirmBtn) {
+          confirmBtn.remove();
+        }
+
+        const disc = lastChange;
+
+        if (selection.length > 0) {
+          this.addActionButton("nib_confirmBtn", _("Confirm selection"), () => {
+            this.onTakeDisc(disc);
+          });
+        }
+      };
+
+      let rowId = 0;
+      let columnId = 0;
       this.nibGlobals.board.forEach((row) => {
         row.forEach((colorId) => {
-          columnId++;
-
           const card = {
             row: rowId,
             column: columnId,
             colorId: colorId,
           };
+
+          columnId++;
 
           this.nibStocks.board.addCard(card);
         });
@@ -104,19 +122,13 @@ define([
     onEnteringState: function (stateName, args) {
       console.log("Entering state: " + stateName);
 
-      switch (stateName) {
-        /* Example:
-            
-            case 'myGameState':
-            
-                // Show some HTML block at this game state
-                dojo.style( 'my_html_block_id', 'display', 'block' );
-                
-                break;
-           */
+      if (stateName === "playerTurn") {
+        const legalMoves = args.args.legalMoves;
 
-        case "dummmy":
-          break;
+        console.log(legalMoves);
+
+        console.log(this.nibStocks.board.setSelectableCards(legalMoves))
+        console.log(this.nibStocks.board);
       }
     },
 
@@ -181,37 +193,9 @@ define([
     ///////////////////////////////////////////////////
     //// Player's action
 
-    /*
-        
-            Here, you are defining methods to handle player's action (ex: results of mouse click on 
-            game objects).
-            
-            Most of the time, these methods:
-            _ check the action is possible at this game state.
-            _ make a call to the game server
-        
-        */
-
-    /* Example:
-        
-        onMyMethodToCall1: function( evt )
-        {
-            console.log( 'onMyMethodToCall1' );
-            
-            // Preventing default browser reaction
-            dojo.stopEvent( evt );
-
-            this.bgaPerformAction("myAction", { 
-                myArgument1: arg1, 
-                myArgument2: arg2,
-                ...
-            }).then(() =>  {                
-                // What to do after the server call if it succeeded
-                // (most of the time, nothing, as the game will react to notifs / change of state instead)
-            });        
-        },        
-        
-        */
+    onTakeDisc: function (disc) {
+      this.bgaPerformAction("takeDisc", disc);
+    },
 
     ///////////////////////////////////////////////////
     //// Reaction to cometD notifications

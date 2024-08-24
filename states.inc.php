@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -13,7 +14,7 @@
  * Nibble game states description
  *
  */
- 
+
 $machinestates = array(
 
     // The initial state. Please do not modify.
@@ -22,18 +23,27 @@ $machinestates = array(
         "description" => "",
         "type" => "manager",
         "action" => "stGameSetup",
-        "transitions" => array( "" => 2 )
+        "transitions" => array("" => 2)
+    ),
+
+    20 => array(
+        "name" => "betweenTurns",
+        "description" => "",
+        "type" => "game",
+        "action" => "st_betweenTurns",
+        "transitions" => array("playerTurn" => 2),
     ),
 
     2 => array(
-    		"name" => "playerTurn",
-    		"description" => clienttranslate('${actplayer} must take a disc'),
-    		"descriptionmyturn" => clienttranslate('${you} must take a disc'),
-    		"type" => "activeplayer",
-    		"possibleactions" => array("takeDisc", "pass"),
-    		"transitions" => array("takeDisc", "pass")
+        "name" => "playerTurn",
+        "description" => clienttranslate('${actplayer} must take a disc'),
+        "descriptionmyturn" => clienttranslate('${you} must take a disc'),
+        "type" => "activeplayer",
+        "args" => "argPlayerTurn",
+        "possibleactions" => array("takeDisc", "pass"),
+        "transitions" => array("takeDisc" => 20, "pass" => 3)
     ),
-   
+
     // Final state.
     // Please do not modify (and do not overload action/args methods).
     99 => array(
@@ -45,6 +55,3 @@ $machinestates = array(
     )
 
 );
-
-
-
