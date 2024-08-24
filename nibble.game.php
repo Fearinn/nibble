@@ -178,7 +178,7 @@ class Nibble extends Table
     //////////// Utility functions
     //////////// 
 
-    function calcLegalMoves()
+    function calcLegalMoves(bool $saveInDb = false): array
     {
         $legalMoves = array();
 
@@ -193,7 +193,7 @@ class Nibble extends Table
             }
         }
 
-        if ($this->globals->get("legalMoves") === null) {
+        if ($saveInDb || $this->globals->get("legalMoves") === null) {
             $this->globals->set("legalMoves", $legalMoves);
         }
 
@@ -201,7 +201,7 @@ class Nibble extends Table
     }
 
 
-    function isMoveLegal(array $board, int $x, int $y, $activeColor)
+    function isMoveLegal(array $board, int $x, int $y, ?int $activeColor)
     {
         $color = $board[$x][$y];
 
@@ -344,15 +344,6 @@ class Nibble extends Table
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
     ////////////
-
-    function st_betweenTurns()
-    {
-        $legalMoves = $this->calcLegalMoves();
-
-        $this->globals->set("legalMoves", $legalMoves);
-
-        $this->gamestate->nextState("playerTurn");
-    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie

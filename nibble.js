@@ -61,6 +61,7 @@ define([
       console.log("Starting game setup");
 
       this.nibGlobals.board = gamedatas.board;
+      this.nibGlobals.legalMoves = gamedatas.legalMoves;
 
       const boardElement = document.getElementById("nib_board");
 
@@ -70,9 +71,11 @@ define([
         {}
       );
 
-      this.nibStocks.board.setSelectionMode("single");
-
       this.nibStocks.board.onSelectionChange = (selection, lastChange) => {
+        if (!this.isCurrentPlayerActive()) {
+          return;
+        }
+
         const confirmBtn = document.getElementById("nib_confirmBtn");
 
         if (confirmBtn) {
@@ -90,6 +93,7 @@ define([
 
       let rowId = 0;
       let columnId = 0;
+
       this.nibGlobals.board.forEach((row) => {
         row.forEach((colorId) => {
           const card = {
@@ -98,9 +102,13 @@ define([
             colorId: colorId,
           };
 
-          columnId++;
+          const isSelectable = this.nibGlobals.legalMoves.some((disc) => {
+            return disc.row == rowId && disc.column == columnId;
+          });
 
-          this.nibStocks.board.addCard(card);
+          this.nibStocks.board.addCard(card, {}, { selectable: isSelectable });
+
+          columnId++;
         });
 
         rowId++;
@@ -125,10 +133,11 @@ define([
       if (stateName === "playerTurn") {
         const legalMoves = args.args.legalMoves;
 
-        console.log(legalMoves);
+        this.nibGlobals.legalMoves = legalMoves;
 
-        console.log(this.nibStocks.board.setSelectableCards(legalMoves))
-        console.log(this.nibStocks.board);
+        if (this.isCurrentPlayerActive()) {
+          this.nibStocks.board.setSelectionMode("single", legalMoves);
+        }
       }
     },
 
@@ -138,19 +147,10 @@ define([
     onLeavingState: function (stateName) {
       console.log("Leaving state: " + stateName);
 
-      switch (stateName) {
-        /* Example:
-            
-            case 'myGameState':
-            
-                // Hide the HTML block we are displaying only during this game state
-                dojo.style( 'my_html_block_id', 'display', 'none' );
-                
-                break;
-           */
-
-        case "dummmy":
-          break;
+      if (stateName === "playerTurn") {
+        if (!this.isCurrentPlayerActive()) {
+          this.nibStocks.board.selectionMode("none");
+        }
       }
     },
 
