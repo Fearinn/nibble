@@ -15,6 +15,10 @@
 
 @import url("modules/bga-cards.css");
 
+.bga-cards_disabled-card {
+  opacity: 0.75;
+}
+
 .nib_gameArea div {
   box-sizing: border-box;
 }
@@ -36,10 +40,14 @@
   width: 60px;
 }
 
-.nib_selectedDisc {
-  border: 4px dashed green;
-}
-
 .nib_disc div {
   border-radius: 100%;
+}
+
+.nib_selectedDisc {
+  border-radius: 0;
+}
+
+.nib_selectedDisc div {
+  border-radius: 0;
 }

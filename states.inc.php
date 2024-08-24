@@ -26,14 +26,6 @@ $machinestates = array(
         "transitions" => array("" => 2)
     ),
 
-    20 => array(
-        "name" => "betweenTurns",
-        "description" => "",
-        "type" => "game",
-        "action" => "st_betweenTurns",
-        "transitions" => array("playerTurn" => 2),
-    ),
-
     2 => array(
         "name" => "playerTurn",
         "description" => clienttranslate('${actplayer} must take a disc'),
@@ -41,7 +33,23 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "argPlayerTurn",
         "possibleactions" => array("takeDisc", "pass"),
-        "transitions" => array("takeDisc" => 20, "pass" => 3)
+        "transitions" => array("movesCalc" => 3, "pass" => 4)
+    ),
+
+    3 => array(
+        "name" => "movesCalc",
+        "description" => "",
+        "type" => "game",
+        "action" => "st_movesCalc",
+        "transitions" => array("nextTurn" => 2, "betweenPlayers" => 4),
+    ),
+
+    4 => array(
+        "name" => "betweenPlayers",
+        "description" => "",
+        "type" => "game",
+        "action" => "st_betweenPlayers",
+        "transitions" => array("nextPlayer" => 2),
     ),
 
     // Final state.

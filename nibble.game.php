@@ -160,7 +160,7 @@ class Nibble extends Table
         $result = array(
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
-            "legalMoves" => $this->globals->get("legalMoves", $this->calcLegalMoves()),
+            "legalMoves" => $this->calcLegalMoves(),
         );
 
         return $result;
@@ -178,8 +178,17 @@ class Nibble extends Table
     //////////// Utility functions
     //////////// 
 
-    function calcLegalMoves(bool $saveInDb = false): array
+    function calcLegalMoves(bool $useCached = false): array
     {
+
+        if ($useCached) {
+            $cached = $this->globals->get("legalMoves");
+
+            if ($cached !== null) {
+                return $cached;
+            }
+        }
+
         $legalMoves = array();
 
         $board = $this->globals->get("board");
@@ -188,14 +197,12 @@ class Nibble extends Table
         foreach ($board as $rowId => $row) {
             foreach ($row as $columnId => $color) {
                 if ($this->isMoveLegal($board, $rowId, $columnId, $activeColor)) {
-                    $legalMoves[] = array("row" => $rowId, "column" => $columnId);
+                    $legalMoves[] = array("row" => $rowId, "column" => $columnId, "colorId" => $color);
                 };
             }
         }
 
-        if ($saveInDb || $this->globals->get("legalMoves") === null) {
-            $this->globals->set("legalMoves", $legalMoves);
-        }
+        $this->globals->set("legalMoves", $legalMoves);
 
         return $legalMoves;
     }
@@ -311,22 +318,38 @@ class Nibble extends Table
 
     function takeDisc(array $disc)
     {
+        $player_id = $this->getActivePlayerId();
+
         $board = $this->globals->get("board");
 
         $legalMoves = $this->globals->get("legalMoves");
 
         if (!in_array($disc, $legalMoves)) {
-            throw new BgaVisibleSystemException("You can't take this disc");
+            throw new BgaVisibleSystemException("You can't take this disc now");
         }
 
         $disc_row = $disc["row"];
         $disc_column = $disc["column"];
-
+        $disc_color = $disc["colorId"];
 
         $board[$disc_row][$disc_column] = null;
 
         $this->globals->set("board", $board);
-        $this->globals->set("activeColor", $disc["colorId"]);
+        $this->globals->set("activeColor", $disc_color);
+
+        $this->notifyAllPlayers(
+            "takeDisc",
+            clienttranslate('${player_name} takes a disc from position (${row}, ${column})'),
+            array(
+                "player_id" => $player_id,
+                "player_name" => $this->getPlayerNameById($player_id),
+                "row" => $disc_row,
+                "column" => $disc_column,
+                "colorId" => $disc_color
+            )
+        );
+
+        $this->gamestate->nextState("movesCalc");
     }
 
 
@@ -344,6 +367,39 @@ class Nibble extends Table
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions
     ////////////
+
+    function st_movesCalc()
+    {
+        $legalMoves = $this->calcLegalMoves();
+
+        $player_id = $this->getActivePlayerId();
+
+        if (!$legalMoves) {
+            $this->notifyAllPlayers(
+                "outOfMoves",
+                clienttranslate('${player_name} is out of legal moves and automatically passes'),
+                array(
+                    "player_id" => $player_id,
+                    "player_name" => $this->getPlayerNameById($player_id)
+                )
+            );
+
+            $this->gamestate->nextState("betweenPlayers");
+            return;
+        }
+
+        $this->gamestate->nextState("nextTurn");
+    }
+
+    function st_betweenPlayers()
+    {
+        $this->globals->set("activeColor", null);
+        $this->calcLegalMoves();
+
+        $this->activeNextPlayer();
+
+        $this->gamestate->nextState("nextPlayer");
+    }
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Zombie

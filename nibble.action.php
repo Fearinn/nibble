@@ -1,4 +1,5 @@
 <?php
+
 /**
  *------
  * BGA framework: Gregory Isabelli & Emmanuel Colin & BoardGameArena
@@ -20,49 +21,38 @@
  * this.bgaPerformAction("myAction", ...)
  *
  */
-  
-  
-  class action_nibble extends APP_GameAction
-  { 
-    // Constructor: please do not modify
-   	public function __default()
-  	{
-  	    if( $this->isArg( 'notifwindow') )
-  	    {
-            $this->view = "common_notifwindow";
-  	        $this->viewArgs['table'] = $this->getArg( "table", AT_posint, true );
-  	    }
-  	    else
-  	    {
-            $this->view = "nibble_nibble";
-            $this->trace( "Complete reinitialization of board game" );
-      }
-  	} 
-  	
-  	// TODO: defines your action entry points there
 
 
-    /*
-    
-    Example:
-  	
-    public function myAction()
-    {
-        $this->setAjaxMode();     
-
-        // Retrieve arguments
-        // Note: these arguments correspond to what has been sent through the javascript "bgaPerformAction" method
-        $arg1 = $this->getArg( "myArgument1", AT_posint, true );
-        $arg2 = $this->getArg( "myArgument2", AT_posint, true );
-
-        // Then, call the appropriate method in your game logic, like "playCard" or "myAction"
-        $this->game->myAction( $arg1, $arg2 );
-
-        $this->ajaxResponse( );
+class action_nibble extends APP_GameAction
+{
+  // Constructor: please do not modify
+  public function __default()
+  {
+    if ($this->isArg('notifwindow')) {
+      $this->view = "common_notifwindow";
+      $this->viewArgs['table'] = $this->getArg("table", AT_posint, true);
+    } else {
+      $this->view = "nibble_nibble";
+      $this->trace("Complete reinitialization of board game");
     }
-    
-    */
-
   }
-  
 
+  public function takeDisc()
+  {
+    $this->setAjaxMode();
+
+    $row = $this->getArg("row", AT_posint, true);
+    $column = $this->getArg("column", AT_posint, true);
+    $colorId = $this->getArg("colorId", AT_posint, true);
+
+    $disc = array(
+      "row" => $row,
+      "column" => $column,
+      "colorId" => $colorId
+    );
+
+    $this->game->takeDisc($disc);
+
+    $this->ajaxResponse();
+  }
+}

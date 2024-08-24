@@ -31,12 +31,12 @@ define([
       this.nibStocks = {};
 
       this.nibGlobals.colors = {
-        1: "lightgreen",
+        1: "green",
         2: "purple",
         3: "red",
         4: "yellow",
         5: "orange",
-        6: "lightblue",
+        6: "blue",
         7: "white",
         8: "gray",
         9: "black",
@@ -50,6 +50,8 @@ define([
         setupDiv: (card, div) => {
           div.classList.add("nib_disc");
           div.style.backgroundColor = this.nibGlobals.colors[card.colorId];
+          div.style.gridRow = card.row + 1;
+          div.style.gridColumn = card.column + 1;
           div.style.position = "relative";
         },
         setupFrontDiv: (card, div) => {},
@@ -72,10 +74,6 @@ define([
       );
 
       this.nibStocks.board.onSelectionChange = (selection, lastChange) => {
-        if (!this.isCurrentPlayerActive()) {
-          return;
-        }
-
         const confirmBtn = document.getElementById("nib_confirmBtn");
 
         if (confirmBtn) {
@@ -106,7 +104,13 @@ define([
             return disc.row == rowId && disc.column == columnId;
           });
 
-          this.nibStocks.board.addCard(card, {}, { selectable: isSelectable });
+          if (card.colorId) {
+            this.nibStocks.board.addCard(
+              card,
+              {},
+              { selectable: isSelectable }
+            );
+          }
 
           columnId++;
         });
@@ -148,9 +152,7 @@ define([
       console.log("Leaving state: " + stateName);
 
       if (stateName === "playerTurn") {
-        if (!this.isCurrentPlayerActive()) {
-          this.nibStocks.board.selectionMode("none");
-        }
+        this.nibStocks.board.setSelectionMode("none");
       }
     },
 
@@ -183,63 +185,36 @@ define([
     ///////////////////////////////////////////////////
     //// Utility methods
 
-    /*
-        
-            Here, you can defines some utility methods that you can use everywhere in your javascript
-            script.
-        
-        */
+    performAction: function (action, args) {
+      this.bgaPerformAction(action, args);
+    },
 
     ///////////////////////////////////////////////////
     //// Player's action
 
     onTakeDisc: function (disc) {
-      this.bgaPerformAction("takeDisc", disc);
+      this.performAction("takeDisc", disc);
     },
 
     ///////////////////////////////////////////////////
     //// Reaction to cometD notifications
 
-    /*
-            setupNotifications:
-            
-            In this method, you associate each of your game notifications with your local method to handle it.
-            
-            Note: game notification names correspond to "notifyAllPlayers" and "notifyPlayer" calls in
-                  your nibble.game.php file.
-        
-        */
     setupNotifications: function () {
       console.log("notifications subscriptions setup");
 
-      // TODO: here, associate your game notifications with local methods
-
-      // Example 1: standard notification handling
-      // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-
-      // Example 2: standard notification handling + tell the user interface to wait
-      //            during 3 seconds after calling the method in order to let the players
-      //            see what is happening in the game.
-      // dojo.subscribe( 'cardPlayed', this, "notif_cardPlayed" );
-      // this.notifqueue.setSynchronous( 'cardPlayed', 3000 );
-      //
+      dojo.subscribe("takeDisc", this, "notif_takeDisc");
     },
 
-    // TODO: from this point and below, you can write your game notifications handling methods
+    notif_takeDisc: function (notif) {
+      const player_id = notif.args.player_id;
 
-    /*
-        Example:
-        
-        notif_cardPlayed: function( notif )
-        {
-            console.log( 'notif_cardPlayed' );
-            console.log( notif );
-            
-            // Note: notif.args contains the arguments specified during you "notifyAllPlayers" / "notifyPlayer" PHP call
-            
-            // TODO: play the card in the user interface.
-        },    
-        
-        */
+      const disc = {
+        row: notif.args.row,
+        column: notif.args.column,
+        colorId: notif.args.colorId,
+      };
+
+      this.nibStocks.board.removeCard(disc);
+    },
   });
 });
