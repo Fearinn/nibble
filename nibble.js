@@ -42,6 +42,8 @@ define([
         9: "black",
       };
 
+      this.nibGlobals.selectedColor = null;
+
       this.nibCardsManagers.board = new CardManager(this, {
         cardHeight: 60,
         cardWidth: 60,
@@ -75,16 +77,27 @@ define([
 
       this.nibStocks.board.onSelectionChange = (selection, lastChange) => {
         const confirmBtn = document.getElementById("nib_confirmBtn");
+        const itemsCount = selection.length;
+        const disc = lastChange;
 
         if (confirmBtn) {
           confirmBtn.remove();
         }
 
-        const disc = lastChange;
+        if (this.nibGlobals.selectedColor != disc.colorId) {
+          this.nibGlobals.selectedColor = disc.colorId;
 
-        if (selection.length > 0) {
+          if (itemsCount >= 2) {
+            this.nibStocks.board.unselectAll(true);
+            this.nibStocks.board.selectCard(disc, true);
+          }
+
+          return;
+        }
+
+        if (itemsCount > 0) {
           this.addActionButton("nib_confirmBtn", _("Confirm selection"), () => {
-            this.onTakeDisc(disc);
+            this.onTakeDiscs(selection);
           });
         }
       };
@@ -128,9 +141,6 @@ define([
     ///////////////////////////////////////////////////
     //// Game & client states
 
-    // onEnteringState: this method is called each time we are entering into a new game state.
-    //                  You can use this method to perform some user interface changes at this moment.
-    //
     onEnteringState: function (stateName, args) {
       console.log("Entering state: " + stateName);
 
@@ -140,14 +150,11 @@ define([
         this.nibGlobals.legalMoves = legalMoves;
 
         if (this.isCurrentPlayerActive()) {
-          this.nibStocks.board.setSelectionMode("single", legalMoves);
+          this.nibStocks.board.setSelectionMode("multiple", legalMoves);
         }
       }
     },
 
-    // onLeavingState: this method is called each time we are leaving a game state.
-    //                 You can use this method to perform some user interface changes at this moment.
-    //
     onLeavingState: function (stateName) {
       console.log("Leaving state: " + stateName);
 
@@ -156,44 +163,23 @@ define([
       }
     },
 
-    // onUpdateActionButtons: in this method you can manage "action buttons" that are displayed in the
-    //                        action status bar (ie: the HTML links in the status bar).
-    //
     onUpdateActionButtons: function (stateName, args) {
       console.log("onUpdateActionButtons: " + stateName);
-
-      if (this.isCurrentPlayerActive()) {
-        switch (
-          stateName
-          /*               
-                 Example:
- 
-                 case 'myGameState':
-                    
-                    // Add 3 action buttons in the action status bar:
-                    
-                    this.addActionButton( 'button_1_id', _('Button 1 label'), 'onMyMethodToCall1' ); 
-                    this.addActionButton( 'button_2_id', _('Button 2 label'), 'onMyMethodToCall2' ); 
-                    this.addActionButton( 'button_3_id', _('Button 3 label'), 'onMyMethodToCall3' ); 
-                    break;
-*/
-        ) {
-        }
-      }
     },
 
     ///////////////////////////////////////////////////
     //// Utility methods
 
     performAction: function (action, args) {
+      console.log(args);
       this.bgaPerformAction(action, args);
     },
 
     ///////////////////////////////////////////////////
     //// Player's action
 
-    onTakeDisc: function (disc) {
-      this.performAction("takeDisc", disc);
+    onTakeDiscs: function (discs) {
+      this.performAction("takeDiscs", { discs: JSON.stringify(discs) });
     },
 
     ///////////////////////////////////////////////////
@@ -206,13 +192,7 @@ define([
     },
 
     notif_takeDisc: function (notif) {
-      const player_id = notif.args.player_id;
-
-      const disc = {
-        row: notif.args.row,
-        column: notif.args.column,
-        colorId: notif.args.colorId,
-      };
+      const disc = notif.args.disc;
 
       this.nibStocks.board.removeCard(disc);
     },

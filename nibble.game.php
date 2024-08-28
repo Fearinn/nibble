@@ -316,40 +316,47 @@ class Nibble extends Table
     //////////// Player actions
     //////////// 
 
-    function takeDisc(array $disc)
+    function takeDiscs(array $discs)
     {
         $player_id = $this->getActivePlayerId();
 
         $board = $this->globals->get("board");
-
         $legalMoves = $this->globals->get("legalMoves");
+        $activeColor = null;
 
-        if (!in_array($disc, $legalMoves)) {
-            throw new BgaVisibleSystemException("You can't take this disc now");
+        foreach ($discs as $disc) {
+            $disc_row = $disc["row"];
+            $disc_column = $disc["column"];
+            $disc_color = $disc["colorId"];
+
+            if (
+                !in_array($disc, $legalMoves) || ($activeColor && $disc_color != $activeColor)
+            ) {
+                throw new BgaVisibleSystemException("You can't take these disc now");
+            }
+
+            $board[$disc_row][$disc_column] = null;
+
+            if (!$activeColor) {
+                $this->globals->set("activeColor", $disc_color);
+                $activeColor = $disc_color;
+            }
+
+            $this->notifyAllPlayers(
+                "takeDisc",
+                clienttranslate('${player_name} takes a disc from position (${row}, ${column})'),
+                array(
+                    "player_id" => $player_id,
+                    "player_name" => $this->getPlayerNameById($player_id),
+                    "row" => $disc_row + 1,
+                    "column" => $disc_column + 1,
+                    "disc" => $disc
+                )
+            );
         }
 
-        $disc_row = $disc["row"];
-        $disc_column = $disc["column"];
-        $disc_color = $disc["colorId"];
-
-        $board[$disc_row][$disc_column] = null;
-
         $this->globals->set("board", $board);
-        $this->globals->set("activeColor", $disc_color);
-
-        $this->notifyAllPlayers(
-            "takeDisc",
-            clienttranslate('${player_name} takes a disc from position (${row}, ${column})'),
-            array(
-                "player_id" => $player_id,
-                "player_name" => $this->getPlayerNameById($player_id),
-                "row" => $disc_row,
-                "column" => $disc_column,
-                "colorId" => $disc_color
-            )
-        );
-
-        $this->gamestate->nextState("movesCalc");
+        $this->gamestate->nextState("betweenPlayers");
     }
 
 
@@ -361,6 +368,7 @@ class Nibble extends Table
     {
         return array(
             "legalMoves" => $this->globals->get("legalMoves"),
+            "activeColor" => $this->globals->get("activeColor"),
         );
     }
 
@@ -368,28 +376,28 @@ class Nibble extends Table
     //////////// Game state actions
     ////////////
 
-    function st_movesCalc()
-    {
-        $legalMoves = $this->calcLegalMoves();
+    // function st_movesCalc()
+    // {
+    //     $legalMoves = $this->calcLegalMoves();
 
-        $player_id = $this->getActivePlayerId();
+    //     $player_id = $this->getActivePlayerId();
 
-        if (!$legalMoves) {
-            $this->notifyAllPlayers(
-                "outOfMoves",
-                clienttranslate('${player_name} is out of legal moves and automatically passes'),
-                array(
-                    "player_id" => $player_id,
-                    "player_name" => $this->getPlayerNameById($player_id)
-                )
-            );
+    //     if (!$legalMoves) {
+    //         $this->notifyAllPlayers(
+    //             "outOfMoves",
+    //             clienttranslate('${player_name} is out of legal moves and automatically passes'),
+    //             array(
+    //                 "player_id" => $player_id,
+    //                 "player_name" => $this->getPlayerNameById($player_id)
+    //             )
+    //         );
 
-            $this->gamestate->nextState("betweenPlayers");
-            return;
-        }
+    //         $this->gamestate->nextState("betweenPlayers");
+    //         return;
+    //     }
 
-        $this->gamestate->nextState("nextTurn");
-    }
+    //     $this->gamestate->nextState("nextTurn");
+    // }
 
     function st_betweenPlayers()
     {

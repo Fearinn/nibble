@@ -28,23 +28,23 @@ $machinestates = array(
 
     2 => array(
         "name" => "playerTurn",
-        "description" => clienttranslate('${actplayer} must take a disc'),
-        "descriptionmyturn" => clienttranslate('${you} must take a disc'),
+        "description" => clienttranslate('${actplayer} must take one or more discs'),
+        "descriptionmyturn" => clienttranslate('${you} must take one or more discs'),
         "type" => "activeplayer",
         "args" => "argPlayerTurn",
-        "possibleactions" => array("takeDisc", "pass"),
-        "transitions" => array("movesCalc" => 3, "pass" => 4)
+        "possibleactions" => array("takeDiscs"),
+        "transitions" => array("betweenPlayers" => 3)
     ),
+
+    // 3 => array(
+    //     "name" => "movesCalc",
+    //     "description" => "",
+    //     "type" => "game",
+    //     "action" => "st_movesCalc",
+    //     "transitions" => array("nextTurn" => 2, "betweenPlayers" => 4),
+    // ),
 
     3 => array(
-        "name" => "movesCalc",
-        "description" => "",
-        "type" => "game",
-        "action" => "st_movesCalc",
-        "transitions" => array("nextTurn" => 2, "betweenPlayers" => 4),
-    ),
-
-    4 => array(
         "name" => "betweenPlayers",
         "description" => "",
         "type" => "game",
