@@ -45,7 +45,7 @@ define([
 
       this.nib_selections.color = null;
 
-      this.nib_managers.board = new CardManager(this, {
+      this.nib_managers.discs = new CardManager(this, {
         cardHeight: 60,
         cardWidth: 60,
         selectedCardClass: "nib_selectedDisc",
@@ -73,13 +73,15 @@ define([
     setup: function (gamedatas) {
       console.log("Starting game setup");
 
+      this.nib_globals.players = gamedatas.players;
+
       this.nib_globals.board = gamedatas.board;
       this.nib_globals.legalMoves = gamedatas.legalMoves;
 
       const boardElement = document.getElementById("nib_board");
 
       this.nib_stocks.board = new CardStock(
-        this.nib_managers.board,
+        this.nib_managers.discs,
         boardElement,
         {}
       );
@@ -143,6 +145,27 @@ define([
         rowId++;
         columnId = 0;
       });
+
+      for (const player_id in this.nib_globals.players) {
+        const order = player_id == this.player_id ? -1 : 1;
+        document.getElementById("nib_playerCollections").innerHTML += `
+          <div id="nib_playerCollection:${player_id}" class="nib_playerCollection whiteblock" style='order: ${order}'></div>
+        `;
+      }
+
+      for (const player_id in this.nib_globals.players) {
+        this.nib_stocks[player_id] = {};
+        this.nib_stocks[player_id].collection = new SlotStock(
+          this.nib_managers.discs,
+          document.getElementById(`nib_playerCollection:${player_id}`),
+          {
+            slotIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            mapCardSlotToId: (disc) => {
+              return Number(disc.color_id);
+            },
+          }
+        );
+      }
 
       // Setup game notifications to handle (see "setupNotifications" method below)
       this.setupNotifications();

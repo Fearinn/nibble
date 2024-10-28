@@ -33,8 +33,16 @@ html.nib_colorblind .nib_colorblindHelp {
   width: 25%;
 }
 
+.nib_gameArea {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  flex-wrap: wrap;
+}
+
 .nib_gameArea div {
   box-sizing: border-box;
+  margin: 0;
 }
 
 .nib_board {
@@ -42,10 +50,21 @@ html.nib_colorblind .nib_colorblindHelp {
   grid-template-rows: repeat(9, 60px);
   grid-template-columns: repeat(9, 60px);
   gap: 4px;
+}
 
-  aspect-ratio: 1;
-  margin: 0 auto;
-  width: 540px;
+.nib_playerCollections {
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  width: 100%;
+}
+
+.nib_playerCollection {
+  max-width: calc((60px + 8px) * 7);
+  height: calc((60px + 8px) * 8);
+  width: 100%;
 }
 
 .nib_disc {

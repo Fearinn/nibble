@@ -12,10 +12,9 @@
 
 <div id="nib_gameArea" class="nib_gameArea">
   <div id="nib_board" class="nib_board"></div>
+  <div id="nib_playerCollections" class="nib_playerCollections"></div>
 </div>
 
-<script type="text/javascript">
-
-</script>
+<script type="text/javascript"></script>
 
 {OVERALL_GAME_FOOTER}
