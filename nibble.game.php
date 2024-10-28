@@ -316,7 +316,7 @@ class Nibble extends Table
     public function validateDiscsInput($discs): void
     {
         if (!is_array($discs)) {
-            return false;
+            throw new BgaVisibleSystemException("Invalid discs input");
         }
 
         $possible_keys = array("row", "column", "colorId");
@@ -326,7 +326,7 @@ class Nibble extends Table
         foreach ($discs as $disc) {
             foreach ($disc as $key => $value) {
                 if (!in_array($key, $possible_keys)) {
-                    return false;
+                    throw new BgaVisibleSystemException("Invalid discs input");
                 }
             }
 
@@ -352,25 +352,25 @@ class Nibble extends Table
 
         $board = $this->globals->get("board");
         $legalMoves = $this->globals->get("legalMoves");
-        $activeColor = null;
+        $activeColor = $this->globals->get("activeColor");
 
         foreach ($discs as $disc) {
-            $disc_row = $disc["row"];
-            $disc_column = $disc["column"];
-            $disc_color = $disc["colorId"];
+            $disc_row = (int) $disc["row"];
+            $disc_column = (int) $disc["column"];
+            $disc_color = (int) $disc["colorId"];
 
             if (
-                !in_array($disc, $legalMoves) || ($activeColor && $disc_color != $activeColor)
+                !in_array($disc, $legalMoves)
             ) {
-                throw new BgaVisibleSystemException("You can't take these disc now");
+                throw new BgaVisibleSystemException("You can't take these disc now: $disc_color, $activeColor");
             }
-
-            $board[$disc_row][$disc_column] = null;
 
             if (!$activeColor) {
                 $this->globals->set("activeColor", $disc_color);
                 $activeColor = $disc_color;
             }
+
+            $board[$disc_row][$disc_column] = null;
 
             $this->notifyAllPlayers(
                 "takeDisc",
@@ -408,9 +408,13 @@ class Nibble extends Table
 
     public function stBetweenPlayers()
     {
+        $player_id = (int) $this->getActivePlayerId();
+
         $this->globals->set("activeColor", null);
+
         $this->calcLegalMoves();
 
+        $this->giveExtraTime($player_id);
         $this->activeNextPlayer();
 
         $this->gamestate->nextState("nextPlayer");

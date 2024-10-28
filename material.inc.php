@@ -19,3 +19,7 @@
  * are available everywhere in your game logic code.
  *
  */
+
+ $this->colors_info = array(
+    
+ );
