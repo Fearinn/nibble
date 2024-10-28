@@ -171,15 +171,14 @@ define([
     //// Utility methods
 
     performAction: function (action, args) {
-      console.log(args);
       this.bgaPerformAction(action, args);
     },
 
     ///////////////////////////////////////////////////
     //// Player's action
 
-    onTakeDiscs: function (discs) {
-      this.performAction("takeDiscs", { discs: JSON.stringify(discs) });
+    actTakeDiscs: function (discs) {
+      this.performAction("actTakeDiscs", { discs: JSON.stringify(discs) });
     },
 
     ///////////////////////////////////////////////////

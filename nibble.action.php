@@ -36,48 +36,4 @@ class action_nibble extends APP_GameAction
       $this->trace("Complete reinitialization of board game");
     }
   }
-
-  public function validateDiscs($discs): bool
-  {
-    if (!is_array($discs)) {
-      return false;
-    }
-
-    $possible_keys = array("row", "column", "colorId");
-    $possible_positions = range(0, 8);
-    $possible_colors = range(1, 9);
-
-    foreach ($discs as $disc) {
-      foreach ($disc as $key => $value) {
-        if (!in_array($key, $possible_keys)) {
-          return false;
-        }
-      }
-
-      if (
-        !in_array($disc["row"], $possible_positions) ||
-        !in_array($disc["column"], $possible_positions) ||
-        !in_array($disc["colorId"], $possible_colors)
-      ) {
-        return false;
-      }
-    }
-
-    return true;
-  }
-
-  public function takeDiscs()
-  {
-    $this->setAjaxMode();
-
-    $discs = $this->getArg("discs", AT_json, true);
-
-    if (!$this->validateDiscs($discs)) {
-      throw new BgaSystemException("Bad value for: discs", true, true, FEX_bad_input_argument);
-    }
-
-    $this->game->takeDiscs($discs);
-
-    $this->ajaxResponse();
-  }
 }

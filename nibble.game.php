@@ -20,10 +20,11 @@
 
 require_once(APP_GAMEMODULE_PATH . 'module/table/table.game.php');
 
+use Bga\GameFramework\Actions\Types\JsonParam;
 
 class Nibble extends Table
 {
-    function __construct()
+    public function __construct()
     {
         parent::__construct();
 
@@ -166,7 +167,7 @@ class Nibble extends Table
         return $result;
     }
 
-    function getGameProgression()
+    public function getGameProgression()
     {
         // TODO: compute and return the game progression
 
@@ -178,7 +179,7 @@ class Nibble extends Table
     //////////// Utility functions
     //////////// 
 
-    function calcLegalMoves(bool $useCached = false): array
+    public function calcLegalMoves(bool $useCached = false): array
     {
 
         if ($useCached) {
@@ -208,7 +209,7 @@ class Nibble extends Table
     }
 
 
-    function isMoveLegal(array $board, int $x, int $y, ?int $activeColor)
+    public function isMoveLegal(array $board, int $x, int $y, ?int $activeColor)
     {
         $color = $board[$x][$y];
 
@@ -232,7 +233,7 @@ class Nibble extends Table
         return count($components) === 1;
     }
 
-    function isSafeNeighbor(array $board, int $row, int $col)
+    public function isSafeNeighbor(array $board, int $row, int $col)
     {
         // Check the orthogonal neighbors (up, down, left, right)
         $rows = count($board);
@@ -264,7 +265,7 @@ class Nibble extends Table
         return $openNeighbors >= 2;
     }
 
-    function findConnectedComponents($board)
+    public function findConnectedComponents($board)
     {
         $visited = [];
         $components = [];
@@ -283,7 +284,7 @@ class Nibble extends Table
         return $components;
     }
 
-    function floodFill($board, $x, $y, &$visited, &$component)
+    public function floodFill($board, $x, $y, &$visited, &$component)
     {
         $stack = [[$x, $y]];
 
@@ -312,12 +313,41 @@ class Nibble extends Table
         }
     }
 
+    public function validateDiscsInput($discs): void
+    {
+        if (!is_array($discs)) {
+            return false;
+        }
+
+        $possible_keys = array("row", "column", "colorId");
+        $possible_positions = range(0, 8);
+        $possible_colors = range(1, 9);
+
+        foreach ($discs as $disc) {
+            foreach ($disc as $key => $value) {
+                if (!in_array($key, $possible_keys)) {
+                    return false;
+                }
+            }
+
+            if (
+                !in_array($disc["row"], $possible_positions) ||
+                !in_array($disc["column"], $possible_positions) ||
+                !in_array($disc["colorId"], $possible_colors)
+            ) {
+                throw new \BgaVisibleSystemException("Invalid discs input");
+            }
+        }
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
 
-    function takeDiscs(array $discs)
+    public function actTakeDiscs(#[JsonParam(alphanum: false)] array $discs): void
     {
+        $this->validateDiscsInput($discs);
+
         $player_id = $this->getActivePlayerId();
 
         $board = $this->globals->get("board");
@@ -364,7 +394,7 @@ class Nibble extends Table
     //////////// Game state arguments
     ////////////
 
-    function argPlayerTurn()
+    public function argPlayerTurn()
     {
         return array(
             "legalMoves" => $this->globals->get("legalMoves"),
@@ -376,30 +406,7 @@ class Nibble extends Table
     //////////// Game state actions
     ////////////
 
-    // function st_movesCalc()
-    // {
-    //     $legalMoves = $this->calcLegalMoves();
-
-    //     $player_id = $this->getActivePlayerId();
-
-    //     if (!$legalMoves) {
-    //         $this->notifyAllPlayers(
-    //             "outOfMoves",
-    //             clienttranslate('${player_name} is out of legal moves and automatically passes'),
-    //             array(
-    //                 "player_id" => $player_id,
-    //                 "player_name" => $this->getPlayerNameById($player_id)
-    //             )
-    //         );
-
-    //         $this->gamestate->nextState("betweenPlayers");
-    //         return;
-    //     }
-
-    //     $this->gamestate->nextState("nextTurn");
-    // }
-
-    function st_betweenPlayers()
+    public function stBetweenPlayers()
     {
         $this->globals->set("activeColor", null);
         $this->calcLegalMoves();
@@ -413,7 +420,7 @@ class Nibble extends Table
     //////////// Zombie
     ////////////
 
-    function zombieTurn($state, $active_player)
+    protected function zombieTurn(array $state, int $active_player): void
     {
         $statename = $state['name'];
 

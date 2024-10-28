@@ -36,19 +36,11 @@ $machinestates = array(
         "transitions" => array("betweenPlayers" => 3)
     ),
 
-    // 3 => array(
-    //     "name" => "movesCalc",
-    //     "description" => "",
-    //     "type" => "game",
-    //     "action" => "st_movesCalc",
-    //     "transitions" => array("nextTurn" => 2, "betweenPlayers" => 4),
-    // ),
-
     3 => array(
         "name" => "betweenPlayers",
         "description" => "",
         "type" => "game",
-        "action" => "st_betweenPlayers",
+        "action" => "stBetweenPlayers",
         "transitions" => array("nextPlayer" => 2),
     ),
 
