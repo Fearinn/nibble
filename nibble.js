@@ -51,11 +51,19 @@ define([
         selectedCardClass: "nib_selectedDisc",
         getId: (card) => `disc-${card.row}${card.column}`,
         setupDiv: (card, div) => {
+          const color = this.nib_globals.colors[card.color_id];
           div.classList.add("nib_disc");
-          div.style.backgroundColor = this.nib_globals.colors[card.colorId];
+          div.style.backgroundColor = color;
           div.style.gridRow = card.row + 1;
           div.style.gridColumn = card.column + 1;
           div.style.position = "relative";
+
+          this.addTooltip(div.id, _(color), "");
+
+          const colorblindHelp = document.createElement("span");
+          colorblindHelp.textContent = card.color_id;
+          colorblindHelp.classList.add("nib_colorblindHelp");
+          div.appendChild(colorblindHelp);
         },
         setupFrontDiv: (card, div) => {},
         setupBackDiv: (card, div) => {},
@@ -85,13 +93,13 @@ define([
           confirmationBtn.remove();
         }
 
-        if (this.nib_selections.color != disc.colorId) {
+        if (this.nib_selections.color != disc.color_id) {
           if (itemsCount >= 2) {
             this.nib_stocks.board.unselectAll(true);
             this.nib_stocks.board.selectCard(disc, true);
           }
 
-          this.nib_selections.color = disc.colorId;
+          this.nib_selections.color = disc.color_id;
           this.nib_selections.discs = [disc];
         }
 
@@ -110,18 +118,18 @@ define([
       let columnId = 0;
 
       this.nib_globals.board.forEach((row) => {
-        row.forEach((colorId) => {
+        row.forEach((color_id) => {
           const card = {
             row: rowId,
             column: columnId,
-            colorId: colorId,
+            color_id: color_id,
           };
 
           const isSelectable = this.nib_globals.legalMoves.some((disc) => {
             return disc.row == rowId && disc.column == columnId;
           });
 
-          if (card.colorId) {
+          if (card.color_id) {
             this.nib_stocks.board.addCard(
               card,
               {},

@@ -20,6 +20,41 @@
  *
  */
 
- $this->colors_info = array(
-    
- );
+$this->colors_info = [
+    1 => [
+        'name' => 'green',
+        'tr_name' => clienttranslate('green')
+    ],
+    2 => [
+        'name' => 'purple',
+        'tr_name' => clienttranslate('purple')
+    ],
+    3 => [
+        'name' => 'red',
+        'tr_name' => clienttranslate('red')
+    ],
+    4 => [
+        'name' => 'yellow',
+        'tr_name' => clienttranslate('yellow')
+    ],
+    5 => [
+        'name' => 'orange',
+        'tr_name' => clienttranslate('orange')
+    ],
+    6 => [
+        'name' => 'blue',
+        'tr_name' => clienttranslate('blue')
+    ],
+    7 => [
+        'name' => 'white',
+        'tr_name' => clienttranslate('white')
+    ],
+    8 => [
+        'name' => 'gray',
+        'tr_name' => clienttranslate('gray')
+    ],
+    9 => [
+        'name' => 'black',
+        'tr_name' => clienttranslate('black')
+    ],
+];

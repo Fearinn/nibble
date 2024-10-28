@@ -17,7 +17,6 @@
  *
  */
 
-
 require_once(APP_GAMEMODULE_PATH . 'module/table/table.game.php');
 
 use Bga\GameFramework\Actions\Types\JsonParam;
@@ -198,7 +197,7 @@ class Nibble extends Table
         foreach ($board as $rowId => $row) {
             foreach ($row as $columnId => $color) {
                 if ($this->isMoveLegal($board, $rowId, $columnId, $activeColor)) {
-                    $legalMoves[] = array("row" => $rowId, "column" => $columnId, "colorId" => $color);
+                    $legalMoves[] = array("row" => $rowId, "column" => $columnId, "color_id" => $color);
                 };
             }
         }
@@ -207,7 +206,6 @@ class Nibble extends Table
 
         return $legalMoves;
     }
-
 
     public function isMoveLegal(array $board, int $x, int $y, ?int $activeColor)
     {
@@ -319,7 +317,7 @@ class Nibble extends Table
             throw new BgaVisibleSystemException("Invalid discs input");
         }
 
-        $possible_keys = array("row", "column", "colorId");
+        $possible_keys = array("row", "column", "color_id");
         $possible_positions = range(0, 8);
         $possible_colors = range(1, 9);
 
@@ -333,7 +331,7 @@ class Nibble extends Table
             if (
                 !in_array($disc["row"], $possible_positions) ||
                 !in_array($disc["column"], $possible_positions) ||
-                !in_array($disc["colorId"], $possible_colors)
+                !in_array($disc["color_id"], $possible_colors)
             ) {
                 throw new \BgaVisibleSystemException("Invalid discs input");
             }
@@ -357,7 +355,7 @@ class Nibble extends Table
         foreach ($discs as $disc) {
             $disc_row = (int) $disc["row"];
             $disc_column = (int) $disc["column"];
-            $disc_color = (int) $disc["colorId"];
+            $disc_color = (int) $disc["color_id"];
 
             if (
                 !in_array($disc, $legalMoves)
@@ -374,14 +372,18 @@ class Nibble extends Table
 
             $this->notifyAllPlayers(
                 "takeDisc",
-                clienttranslate('${player_name} takes a disc from position (${row}, ${column})'),
-                array(
+                clienttranslate('${player_name} takes a ${color_label} disc from position (${row}, ${column})'),
+                [
                     "player_id" => $player_id,
                     "player_name" => $this->getPlayerNameById($player_id),
                     "row" => $disc_row + 1,
                     "column" => $disc_column + 1,
-                    "disc" => $disc
-                )
+                    "disc" => $disc,
+                    "color_label" => $this->colors_info[$activeColor]["tr_name"],
+                    "i18n" => ["color_label"],
+                    "preserve" => ["color_id"],
+                    "color_id" => $activeColor,
+                ]
             );
         }
 
