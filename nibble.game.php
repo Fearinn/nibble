@@ -135,6 +135,13 @@ class Nibble extends Table
 
         $this->globals->set("board", $board);
 
+        $collections = [];
+        foreach ($players as $player_id => $player) {
+            $collections[$player_id] = [];
+        }
+
+        $this->globals->set("collections", $collections);
+
         // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
@@ -161,6 +168,7 @@ class Nibble extends Table
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
             "legalMoves" => $this->calcLegalMoves(),
+            "collections" => $this->globals->get("collections", []),
         );
 
         return $result;
@@ -369,6 +377,9 @@ class Nibble extends Table
             }
 
             $board[$disc_row][$disc_column] = null;
+
+            $collections[$player_id][] = $disc;
+            $this->globals->set("collections", $collections);
 
             $this->notifyAllPlayers(
                 "takeDisc",

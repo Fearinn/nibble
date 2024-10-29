@@ -77,6 +77,7 @@ define([
 
       this.nib_globals.board = gamedatas.board;
       this.nib_globals.legalMoves = gamedatas.legalMoves;
+      this.nib_globals.collections = gamedatas.collections;
 
       const boardElement = document.getElementById("nib_board");
 
@@ -91,18 +92,23 @@ define([
         const itemsCount = selection.length;
         const disc = lastChange;
 
+        this.nib_selections.discs = selection;
+
         if (confirmationBtn) {
           confirmationBtn.remove();
         }
 
-        if (this.nib_selections.color != disc.color_id) {
+        if (
+          this.nib_selections.color &&
+          this.nib_selections.color != disc.color_id
+        ) {
           if (itemsCount >= 2) {
             this.nib_stocks.board.unselectAll(true);
             this.nib_stocks.board.selectCard(disc, true);
-          }
 
-          this.nib_selections.color = disc.color_id;
-          this.nib_selections.discs = [disc];
+            this.nib_selections.color = disc.color_id;
+            this.nib_selections.discs = [disc];
+          }
         }
 
         if (itemsCount > 0) {
@@ -147,24 +153,39 @@ define([
       });
 
       for (const player_id in this.nib_globals.players) {
+        const player = this.nib_globals.players[player_id];
+
         const order = player_id == this.player_id ? -1 : 1;
-        document.getElementById("nib_playerCollections").innerHTML += `
-          <div id="nib_playerCollection:${player_id}" class="nib_playerCollection whiteblock" style='order: ${order}'></div>
+        document.getElementById("nib_collections").innerHTML += `
+          <div id="nib_collectionContainer:${player_id}"
+          class="nib_collectionContainer whiteblock" style='order: ${order}'>
+            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}">${player.name}</h3>
+            <div id="nib_collection:${player_id}" class="nib_collection"></div>
+          </div>
         `;
       }
 
       for (const player_id in this.nib_globals.players) {
         this.nib_stocks[player_id] = {};
+
         this.nib_stocks[player_id].collection = new SlotStock(
           this.nib_managers.discs,
-          document.getElementById(`nib_playerCollection:${player_id}`),
+          document.getElementById(`nib_collection:${player_id}`),
           {
-            slotIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
-            mapCardSlotToId: (disc) => {
+            center: false,
+            direction: "column",
+            slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            mapCardToSlot: (disc) => {
               return Number(disc.color_id);
             },
           }
         );
+
+        const collections = this.nib_globals.collections[player_id];
+        for (const disc_id in collections) {
+          const disc = collections[disc_id];
+          this.nib_stocks[player_id].collection.addCard(disc);
+        }
       }
 
       // Setup game notifications to handle (see "setupNotifications" method below)
@@ -227,9 +248,12 @@ define([
     },
 
     notif_takeDisc: function (notif) {
+      const player_id = notif.args.player_id;
       const disc = notif.args.disc;
 
-      this.nib_stocks.board.removeCard(disc);
+      this.nib_stocks[player_id].collection.addCard(disc);
+
+      this.nib_selections.color = null;
     },
   });
 });

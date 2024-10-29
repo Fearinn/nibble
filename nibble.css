@@ -52,7 +52,7 @@ html.nib_colorblind .nib_colorblindHelp {
   gap: 4px;
 }
 
-.nib_playerCollections {
+.nib_collections {
   display: flex;
   align-items: stretch;
   justify-content: center;
@@ -61,15 +61,24 @@ html.nib_colorblind .nib_colorblindHelp {
   width: 100%;
 }
 
-.nib_playerCollection {
+.nib_collectionContainer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
   max-width: calc((60px + 8px) * 7);
-  height: calc((60px + 8px) * 8);
+  height: calc((60px + 8px) * 9);
   width: 100%;
 }
 
+.nib_collection > div {
+  display: flex;
+  gap: 4px;
+  height: 60px;
+}
+
 .nib_disc {
-  aspect-ratio: 1;
   border-radius: 100%;
+  height: 60px;
   width: 60px;
 }
 
