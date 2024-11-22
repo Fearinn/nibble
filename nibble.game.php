@@ -165,6 +165,7 @@ class Nibble extends Table
 
         $sql = "SELECT player_id id, player_score score FROM player";
         $result = array(
+            "version" => (int) $this->gamestate->table_globals[300],
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
             "legalMoves" => $this->calcLegalMoves(),
@@ -186,9 +187,16 @@ class Nibble extends Table
     //////////// Utility functions
     //////////// 
 
+    public function checkVersion(int $clientVersion): void
+    {
+        $serverVersion = (int) $this->gamestate->table_globals[300];
+        if ($clientVersion != $serverVersion) {
+            throw new \BgaVisibleSystemException($this->_("A new version of this game is now available. Please reload the page (F5)."));
+        }
+    }
+
     public function calcLegalMoves(bool $useCached = false): array
     {
-
         if ($useCached) {
             $cached = $this->globals->get("legalMoves");
 
@@ -350,8 +358,10 @@ class Nibble extends Table
     //////////// Player actions
     //////////// 
 
-    public function actTakeDiscs(#[JsonParam(alphanum: false)] array $discs): void
+    public function actTakeDiscs(int $clientVersion, #[JsonParam(alphanum: false)] array $discs): void
     {
+        $this->checkVersion($clientVersion);
+
         $this->validateDiscsInput($discs);
 
         $player_id = $this->getActivePlayerId();

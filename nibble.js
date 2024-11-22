@@ -26,12 +26,12 @@ define([
     constructor: function () {
       console.log("nibble constructor");
 
-      this.nib_globals = {};
-      this.nib_managers = {};
-      this.nib_stocks = {};
-      this.nib_selections = {};
+      this.nib.globals = {};
+      this.nib.managers = {};
+      this.nib.stocks = {};
+      this.nib.selections = {};
 
-      this.nib_globals.colors = {
+      this.nib.globals.colors = {
         1: "green",
         2: "purple",
         3: "red",
@@ -43,15 +43,19 @@ define([
         9: "black",
       };
 
-      this.nib_selections.color = null;
+      this.nib.selections.color = null;
+    },
 
-      this.nib_managers.discs = new CardManager(this, {
+    setup: function (gamedatas) {
+      console.log("Starting game setup");
+
+      this.nib.managers.discs = new CardManager(this, {
         cardHeight: 60,
         cardWidth: 60,
         selectedCardClass: "nib_selectedDisc",
         getId: (card) => `disc-${card.row}${card.column}`,
         setupDiv: (card, div) => {
-          const color = this.nib_globals.colors[card.color_id];
+          const color = this.nib.globals.colors[card.color_id];
           div.classList.add("nib_disc");
           div.style.backgroundColor = color;
           div.style.gridRow = card.row + 1;
@@ -68,46 +72,43 @@ define([
         setupFrontDiv: (card, div) => {},
         setupBackDiv: (card, div) => {},
       });
-    },
 
-    setup: function (gamedatas) {
-      console.log("Starting game setup");
+      this.nib.version = gamedatas.version;
+      this.nib.globals.players = gamedatas.players;
 
-      this.nib_globals.players = gamedatas.players;
-
-      this.nib_globals.board = gamedatas.board;
-      this.nib_globals.legalMoves = gamedatas.legalMoves;
-      this.nib_globals.collections = gamedatas.collections;
+      this.nib.globals.board = gamedatas.board;
+      this.nib.globals.legalMoves = gamedatas.legalMoves;
+      this.nib.globals.collections = gamedatas.collections;
 
       const boardElement = document.getElementById("nib_board");
 
-      this.nib_stocks.board = new CardStock(
-        this.nib_managers.discs,
+      this.nib.stocks.board = new CardStock(
+        this.nib.managers.discs,
         boardElement,
         {}
       );
 
-      this.nib_stocks.board.onSelectionChange = (selection, lastChange) => {
+      this.nib.stocks.board.onSelectionChange = (selection, lastChange) => {
         const confirmationBtn = document.getElementById("nib_confirmationBtn");
         const itemsCount = selection.length;
         const disc = lastChange;
 
-        this.nib_selections.discs = selection;
+        this.nib.selections.discs = selection;
 
         if (confirmationBtn) {
           confirmationBtn.remove();
         }
 
         if (
-          this.nib_selections.color &&
-          this.nib_selections.color != disc.color_id
+          this.nib.selections.color &&
+          this.nib.selections.color != disc.color_id
         ) {
           if (itemsCount >= 2) {
-            this.nib_stocks.board.unselectAll(true);
-            this.nib_stocks.board.selectCard(disc, true);
+            this.nib.stocks.board.unselectAll(true);
+            this.nib.stocks.board.selectCard(disc, true);
 
-            this.nib_selections.color = disc.color_id;
-            this.nib_selections.discs = [disc];
+            this.nib.selections.color = disc.color_id;
+            this.nib.selections.discs = [disc];
           }
         }
 
@@ -125,7 +126,7 @@ define([
       let rowId = 0;
       let columnId = 0;
 
-      this.nib_globals.board.forEach((row) => {
+      this.nib.globals.board.forEach((row) => {
         row.forEach((color_id) => {
           const card = {
             row: rowId,
@@ -133,12 +134,12 @@ define([
             color_id: color_id,
           };
 
-          const isSelectable = this.nib_globals.legalMoves.some((disc) => {
+          const isSelectable = this.nib.globals.legalMoves.some((disc) => {
             return disc.row == rowId && disc.column == columnId;
           });
 
           if (card.color_id) {
-            this.nib_stocks.board.addCard(
+            this.nib.stocks.board.addCard(
               card,
               {},
               { selectable: isSelectable }
@@ -152,8 +153,8 @@ define([
         columnId = 0;
       });
 
-      for (const player_id in this.nib_globals.players) {
-        const player = this.nib_globals.players[player_id];
+      for (const player_id in this.nib.globals.players) {
+        const player = this.nib.globals.players[player_id];
 
         const order = player_id == this.player_id ? -1 : 1;
         document.getElementById("nib_collections").innerHTML += `
@@ -165,11 +166,11 @@ define([
         `;
       }
 
-      for (const player_id in this.nib_globals.players) {
-        this.nib_stocks[player_id] = {};
+      for (const player_id in this.nib.globals.players) {
+        this.nib.stocks[player_id] = {};
 
-        this.nib_stocks[player_id].collection = new SlotStock(
-          this.nib_managers.discs,
+        this.nib.stocks[player_id].collection = new SlotStock(
+          this.nib.managers.discs,
           document.getElementById(`nib_collection:${player_id}`),
           {
             center: false,
@@ -181,10 +182,10 @@ define([
           }
         );
 
-        const collections = this.nib_globals.collections[player_id];
+        const collections = this.nib.globals.collections[player_id];
         for (const disc_id in collections) {
           const disc = collections[disc_id];
-          this.nib_stocks[player_id].collection.addCard(disc);
+          this.nib.stocks[player_id].collection.addCard(disc);
         }
       }
 
@@ -203,10 +204,10 @@ define([
       if (stateName === "playerTurn") {
         const legalMoves = args.args.legalMoves;
 
-        this.nib_globals.legalMoves = legalMoves;
+        this.nib.globals.legalMoves = legalMoves;
 
         if (this.isCurrentPlayerActive()) {
-          this.nib_stocks.board.setSelectionMode("multiple", legalMoves);
+          this.nib.stocks.board.setSelectionMode("multiple", legalMoves);
         }
       }
     },
@@ -215,7 +216,7 @@ define([
       console.log("Leaving state: " + stateName);
 
       if (stateName === "playerTurn") {
-        this.nib_stocks.board.setSelectionMode("none");
+        this.nib.stocks.board.setSelectionMode("none");
       }
     },
 
@@ -226,7 +227,8 @@ define([
     ///////////////////////////////////////////////////
     //// Utility methods
 
-    performAction: function (action, args) {
+    performAction: function (action, args = {}) {
+      args.clientVersion = this.nib.version;
       this.bgaPerformAction(action, args);
     },
 
@@ -234,7 +236,7 @@ define([
     //// Player's action
 
     actTakeDiscs: function () {
-      const discs = this.nib_selections.discs;
+      const discs = this.nib.selections.discs;
       this.performAction("actTakeDiscs", { discs: JSON.stringify(discs) });
     },
 
@@ -251,9 +253,9 @@ define([
       const player_id = notif.args.player_id;
       const disc = notif.args.disc;
 
-      this.nib_stocks[player_id].collection.addCard(disc);
+      this.nib.stocks[player_id].collection.addCard(disc);
 
-      this.nib_selections.color = null;
+      this.nib.selections.color = null;
     },
   });
 });
