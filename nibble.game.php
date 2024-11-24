@@ -354,6 +354,57 @@ class Nibble extends Table
         }
     }
 
+    public function calcMajorities(): void {
+        $majorities = [];
+        $collections = $this->globals->get("collections");
+
+        $majorities = [];
+        foreach ($collections as $player_id => $colors) {
+            $majorities[$player_id] = 0;
+
+            foreach ($colors as $color_id => $discs) {
+                $discsCount = count($discs);
+
+                if ($discsCount >= 5) {
+                    $majorities[$player_id]++;
+                }
+            }
+        }
+
+        arsort($majorities);
+        $winner_id = key($majorities);
+    }
+
+    public function isGameEnd(): bool
+    {
+        $isGameEnd = false;
+
+        $board = $this->globals->get("board", []);
+        if (!$board) {
+            $this->calcMajorities();
+            return true;
+        }
+
+        $sevenOrMore = [];
+        $collections = $this->globals->get("collections");
+        foreach ($collections as $player_id => $colors) {
+            $sevenOrMore[$player_id] = [];
+
+            foreach ($colors as $color_id => $discs) {
+                $discsCount = count($discs);
+                if ($discsCount === 9) {
+                    return true;
+                }
+
+                if ($discsCount >= 7) {
+                    $sevenOrMore[$player_id]++;
+                }
+            }
+        }
+
+        return $isGameEnd;
+    }
+
     //////////////////////////////////////////////////////////////////////////////
     //////////// Player actions
     //////////// 
@@ -388,7 +439,7 @@ class Nibble extends Table
 
             $board[$disc_row][$disc_column] = null;
 
-            $collections[$player_id][] = $disc;
+            $collections[$player_id][$disc_color][] = $disc;
             $this->globals->set("collections", $collections);
 
             $this->notifyAllPlayers(
@@ -414,22 +465,23 @@ class Nibble extends Table
 
 
     //////////////////////////////////////////////////////////////////////////////
-    //////////// Game state arguments
+    //////////// Game state actions and arguments
     ////////////
 
-    public function argPlayerTurn()
+    public function stPlayerTurn(): void {}
+
+    public function argPlayerTurn(): array
     {
+        $isGameEnd = $this->isGameEnd();
+
         return array(
             "legalMoves" => $this->globals->get("legalMoves"),
             "activeColor" => $this->globals->get("activeColor"),
+            "isGameEnd" => $isGameEnd,
         );
     }
 
-    //////////////////////////////////////////////////////////////////////////////
-    //////////// Game state actions
-    ////////////
-
-    public function stBetweenPlayers()
+    public function stBetweenPlayers(): void
     {
         $player_id = (int) $this->getActivePlayerId();
 

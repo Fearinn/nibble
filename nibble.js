@@ -183,9 +183,9 @@ define([
         );
 
         const collections = this.nib.globals.collections[player_id];
-        for (const disc_id in collections) {
-          const disc = collections[disc_id];
-          this.nib.stocks[player_id].collection.addCard(disc);
+        for (const color_id in collections) {
+          const discs = collections[color_id];
+          this.nib.stocks[player_id].collection.addCards(discs);
         }
       }
 
