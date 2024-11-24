@@ -3,14 +3,28 @@
     "name": "Colorblind Support",
     "needReload": true,
     "values": {
-      "1": {
+      "0": {
         "name": "Off"
       },
-      "2": {
+      "1": {
         "name": "On",
         "cssPref": "nib_colorblind"
       }
     },
     "default": 1
+  },
+  "101": {
+    "name": "Piece format",
+    "needReload": true,
+    "values": {
+      "1": {
+        "name": "Disc"
+      },
+      "2": {
+        "name": "Square",
+        "cssPref": "nib_square"
+      }
+    },
+    "default": 2
   }
 }

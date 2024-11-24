@@ -26,6 +26,7 @@ define([
     constructor: function () {
       console.log("nibble constructor");
 
+      this.nib = {};
       this.nib.globals = {};
       this.nib.managers = {};
       this.nib.stocks = {};

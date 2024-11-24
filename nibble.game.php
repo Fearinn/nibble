@@ -379,8 +379,17 @@ class Nibble extends Table
     {
         $isGameEnd = false;
 
-        $board = $this->globals->get("board", []);
-        if (!$board) {
+        $board = $this->globals->get("board");
+        $boardCount = 0;
+        for ($x = 0; $x < 9; $x++) {
+            for ($y = 0; $y < 9; $y++) {
+                if ($board[$x][$y] !== null) {
+                    $boardCount++;
+                }
+            }
+        } 
+
+        if ($boardCount === 0) {
             $this->calcMajorities();
             return true;
         }
@@ -444,7 +453,7 @@ class Nibble extends Table
 
             $this->notifyAllPlayers(
                 "takeDisc",
-                clienttranslate('${player_name} takes a ${color_label} disc from position (${row}, ${column})'),
+                clienttranslate('${player_name} takes a ${color_label} piece from position (${row}, ${column})'),
                 [
                     "player_id" => $player_id,
                     "player_name" => $this->getPlayerNameById($player_id),
