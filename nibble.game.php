@@ -341,6 +341,7 @@ class Nibble extends Table
         $possible_positions = range(0, 8);
         $possible_colors = range(1, 9);
 
+        $currentColor = null;
         foreach ($discs as $disc) {
             foreach ($disc as $key => $value) {
                 if (!in_array($key, $possible_keys)) {
@@ -353,7 +354,16 @@ class Nibble extends Table
                 !in_array($disc["column"], $possible_positions) ||
                 !in_array($disc["color_id"], $possible_colors)
             ) {
-                throw new \BgaVisibleSystemException("Invalid discs input");
+                throw new BgaVisibleSystemException("Invalid discs input");
+            }
+
+            $discColor = (int) $disc["color_id"];
+            if ($currentColor === null) {
+                $currentColor = $discColor;
+            }
+
+            if ($currentColor !== $discColor) {
+                throw new BgaVisibleSystemException("Invalid discs input");
             }
         }
     }

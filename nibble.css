@@ -96,6 +96,7 @@ html {
 .nib_collection .slot {
   display: flex;
   flex-direction: column;
+  gap: 2px;
   order: 99;
   width: var(--pieceSize);
 }
@@ -110,10 +111,6 @@ html {
   flex-shrink: 0;
   height: 100%;
   width: calc(var(--pieceSize) + 4px);
-}
-
-.nib_collection .nib_disc:not(:first-child) {
-  margin-top: calc(var(--pieceSize) * -0.5);
 }
 
 .nib_disc {

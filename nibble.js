@@ -110,7 +110,6 @@ define([
             this.nib.stocks.board.unselectAll(true);
             this.nib.stocks.board.selectCard(disc, true);
 
-            this.nib.selections.color = disc.color_id;
             this.nib.selections.discs = [disc];
           }
         }
@@ -123,6 +122,9 @@ define([
               this.actTakeDiscs();
             }
           );
+          this.nib.selections.color = disc.color_id;
+        } else {
+          this.nib.selections.color = null;
         }
       };
 
@@ -185,7 +187,11 @@ define([
 
           orderedColors.forEach((color_id) => {
             const color = this.nib.info.colors[color_id];
-            this.addTooltip(`nib_separator:${player_id}-${color_id}`, color, "");
+            this.addTooltip(
+              `nib_separator:${player_id}-${color_id}`,
+              color,
+              ""
+            );
           });
         }
       }
@@ -259,6 +265,8 @@ define([
 
       if (stateName === "playerTurn") {
         this.nib.stocks.board.setSelectionMode("none");
+        this.nib.selections.color = null;
+        this.nib.selections.discs = [];
       }
     },
 
