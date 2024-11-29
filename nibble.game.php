@@ -368,7 +368,8 @@ class Nibble extends Table
         }
     }
 
-    public function calcMajorities(): void {
+    public function majorityOfMajorities(): int
+    {
         $majorities = [];
         $collections = $this->globals->get("collections");
 
@@ -387,11 +388,14 @@ class Nibble extends Table
 
         arsort($majorities);
         $winner_id = key($majorities);
+
+        return $winner_id;
     }
 
     public function isGameEnd(): bool
     {
-        $isGameEnd = false;
+        $winner_id = null;
+        $win_condition = null;
 
         $board = $this->globals->get("board");
         $boardCount = 0;
@@ -401,31 +405,64 @@ class Nibble extends Table
                     $boardCount++;
                 }
             }
-        } 
-
-        if ($boardCount === 0) {
-            $this->calcMajorities();
-            return true;
         }
 
         $sevenOrMore = [];
         $collections = $this->globals->get("collections");
-        foreach ($collections as $player_id => $colors) {
-            $sevenOrMore[$player_id] = [];
+        $orderedColors = $this->globals->get("orderedColors");
+        foreach ($orderedColors as $color_id) {
+            foreach ($collections as $player_id => $collection) {
+                $discs = [];
 
-            foreach ($colors as $color_id => $discs) {
-                $discsCount = count($discs);
-                if ($discsCount === 9) {
-                    return true;
+                if (array_key_exists($color_id, $collection)) {
+                    $discs = $collection[$color_id];
                 }
 
+                $discsCount = count($discs);
+
+                if ($discsCount === 9) {
+                    $winner_id = $player_id;
+                    $win_condition = clienttranslate("9 pieces of one color");
+                    break;
+                }
+
+                $sevenOrMore = 0;
+
                 if ($discsCount >= 7) {
-                    $sevenOrMore[$player_id]++;
+                    $sevenOrMore++;
+                } else {
+                    $sevenOrMore = 0;
+                }
+
+                if ($sevenOrMore === 3) {
+                    $winner_id = $player_id;
+                    $win_condition = clienttranslate("7 pieces of three adjacent colors");
+                    break;
                 }
             }
         }
 
-        return $isGameEnd;
+        if ($boardCount === 0) {
+            $winner_id = $this->majorityOfMajorities();
+        }
+
+        if ($winner_id) {
+            $this->notifyAllPlayers(
+                "announceWinner",
+                clienttranslate('${player_name} wins the game by "${win_condition}"'),
+                [
+                    "player_id" => $winner_id,
+                    "player_name" => $this->getPlayerNameById($winner_id),
+                    "win_condition" => $win_condition,
+                    "i18n" => ["win_condition"],
+                ]
+            );
+
+            $this->DbQuery("UPDATE player SET player_score=1 WHERE player_id=$winner_id");
+            return true;
+        }
+
+        return false;
     }
 
     //////////////////////////////////////////////////////////////////////////////
@@ -492,22 +529,25 @@ class Nibble extends Table
     //////////// Game state actions and arguments
     ////////////
 
-    public function stPlayerTurn(): void {}
+    public function stPlayerTurn(): void {
+    }
 
     public function argPlayerTurn(): array
     {
-        $isGameEnd = $this->isGameEnd();
-
         return array(
             "legalMoves" => $this->globals->get("legalMoves"),
             "activeColor" => $this->globals->get("activeColor"),
-            "isGameEnd" => $isGameEnd,
         );
     }
 
     public function stBetweenPlayers(): void
     {
         $player_id = (int) $this->getActivePlayerId();
+
+        if ($this->isGameEnd()) {
+            $this->gamestate->nextState("gameEnd");
+            return;
+        }
 
         $this->globals->set("activeColor", null);
 
