@@ -11,8 +11,8 @@
 -->
 
 <div id="nib_gameArea" class="nib_gameArea">
+  <div id="nib_collections" class="nib_collections whiteblock"></div>
   <div id="nib_board" class="nib_board"></div>
-  <div id="nib_collections" class="nib_collections"></div>
 </div>
 
 <script type="text/javascript"></script>

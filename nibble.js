@@ -25,14 +25,19 @@ define([
   return declare("bgagame.nibble", ebg.core.gamegui, {
     constructor: function () {
       console.log("nibble constructor");
+    },
+
+    setup: function (gamedatas) {
+      console.log("Starting game setup");
 
       this.nib = {};
+      this.nib.info = {};
       this.nib.globals = {};
       this.nib.managers = {};
       this.nib.stocks = {};
       this.nib.selections = {};
 
-      this.nib.globals.colors = {
+      this.nib.info.colors = {
         1: "green",
         2: "purple",
         3: "red",
@@ -44,11 +49,15 @@ define([
         9: "black",
       };
 
-      this.nib.selections.color = null;
-    },
+      this.nib.version = gamedatas.version;
+      this.nib.info.players = gamedatas.players;
+      this.nib.info.orderedColors = gamedatas.orderedColors;
 
-    setup: function (gamedatas) {
-      console.log("Starting game setup");
+      this.nib.globals.board = gamedatas.board;
+      this.nib.globals.legalMoves = gamedatas.legalMoves;
+      this.nib.globals.collections = gamedatas.collections;
+
+      this.nib.selections.color = null;
 
       this.nib.managers.discs = new CardManager(this, {
         cardHeight: 60,
@@ -56,7 +65,7 @@ define([
         selectedCardClass: "nib_selectedDisc",
         getId: (card) => `disc-${card.row}${card.column}`,
         setupDiv: (card, div) => {
-          const color = this.nib.globals.colors[card.color_id];
+          const color = this.nib.info.colors[card.color_id];
           div.classList.add("nib_disc");
           div.style.backgroundColor = color;
           div.style.gridRow = card.row + 1;
@@ -73,13 +82,6 @@ define([
         setupFrontDiv: (card, div) => {},
         setupBackDiv: (card, div) => {},
       });
-
-      this.nib.version = gamedatas.version;
-      this.nib.globals.players = gamedatas.players;
-
-      this.nib.globals.board = gamedatas.board;
-      this.nib.globals.legalMoves = gamedatas.legalMoves;
-      this.nib.globals.collections = gamedatas.collections;
 
       const boardElement = document.getElementById("nib_board");
 
@@ -154,28 +156,54 @@ define([
         columnId = 0;
       });
 
-      for (const player_id in this.nib.globals.players) {
-        const player = this.nib.globals.players[player_id];
+      for (const player_id in this.nib.info.players) {
+        const player = this.nib.info.players[player_id];
 
         const order = player_id == this.player_id ? -1 : 1;
-        document.getElementById("nib_collections").innerHTML += `
+
+        const collectionsElement = document.getElementById("nib_collections");
+        collectionsElement.innerHTML += `
           <div id="nib_collectionContainer:${player_id}"
-          class="nib_collectionContainer whiteblock" style='order: ${order}'>
-            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}">${player.name}</h3>
+          class="nib_collectionContainer" style="order: ${order};">
+            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}; order: ${order};">${player.name}</h3>
             <div id="nib_collection:${player_id}" class="nib_collection"></div>
           </div>
         `;
+
+        if (order === -1) {
+          collectionsElement.innerHTML += `<div id="nib_separators:${player_id}" class="nib_separators"></div>`;
+
+          const orderedColors = this.nib.info.orderedColors;
+          const separatorsElement = document.getElementById(
+            `nib_separators:${player_id}`
+          );
+
+          orderedColors.forEach((color_id) => {
+            const color = this.nib.info.colors[color_id];
+            separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color}"></div>`;
+          });
+
+          orderedColors.forEach((color_id) => {
+            const color = this.nib.info.colors[color_id];
+            this.addTooltip(`nib_separator:${player_id}-${color_id}`, color, "");
+          });
+        }
       }
 
-      for (const player_id in this.nib.globals.players) {
+      for (const player_id in this.nib.info.players) {
         this.nib.stocks[player_id] = {};
+
+        const collectionElement = document.getElementById(
+          `nib_collection:${player_id}`
+        );
 
         this.nib.stocks[player_id].collection = new SlotStock(
           this.nib.managers.discs,
-          document.getElementById(`nib_collection:${player_id}`),
+          collectionElement,
           {
             center: false,
-            direction: "column",
+            direction: "row",
+            gap: "4px",
             slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
             mapCardToSlot: (disc) => {
               return Number(disc.color_id);
@@ -184,9 +212,22 @@ define([
         );
 
         const collections = this.nib.globals.collections[player_id];
-        for (const color_id in collections) {
-          const discs = collections[color_id];
-          this.nib.stocks[player_id].collection.addCards(discs);
+        for (const color_id in this.nib.info.colors) {
+          const discs = collections?.[color_id];
+
+          if (discs) {
+            this.nib.stocks[player_id].collection.addCards(discs);
+          }
+
+          const slotElement = collectionElement.querySelector(
+            `[data-slot-id="${color_id}"]`
+          );
+
+          slotElement.style.order = this.nib.info.orderedColors.findIndex(
+            (id) => {
+              return id == color_id;
+            }
+          );
         }
       }
 

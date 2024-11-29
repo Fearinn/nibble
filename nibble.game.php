@@ -132,8 +132,11 @@ class Nibble extends Table
         $boardSize = 9;
         $numColors = 9;
         $board = initializeBoard($boardSize, $numColors);
-
         $this->globals->set("board", $board);
+
+        $colors_ids = array_keys($this->colors_info);
+        shuffle($colors_ids);
+        $this->globals->set("orderedColors", $colors_ids);
 
         $collections = [];
         foreach ($players as $player_id => $player) {
@@ -168,8 +171,9 @@ class Nibble extends Table
             "version" => (int) $this->gamestate->table_globals[300],
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
+            "orderedColors" => $this->globals->get("orderedColors"),
             "legalMoves" => $this->calcLegalMoves(),
-            "collections" => $this->globals->get("collections", []),
+            "collections" => $this->globals->get("collections"),
         );
 
         return $result;
@@ -448,6 +452,7 @@ class Nibble extends Table
 
             $board[$disc_row][$disc_column] = null;
 
+            $collections = $this->globals->get("collections");
             $collections[$player_id][$disc_color][] = $disc;
             $this->globals->set("collections", $collections);
 
