@@ -346,7 +346,7 @@ class Nibble extends Table
         $visited = [];
 
         $currentColor = null;
-        foreach ($discs as $disc) {
+        foreach ($discs as $index => $disc) {
             foreach ($disc as $key => $value) {
                 if (!in_array($key, $possible_keys)) {
                     throw new BgaVisibleSystemException("Invalid discs input");
@@ -372,16 +372,14 @@ class Nibble extends Table
 
             $x = (int) $disc["row"];
             $y = (int) $disc["column"];
-
-            $component = [];
-            $this->floodFill($board, $x, $y, $visited, $component);
-            $components[] = $component;
-
-            if (count($components) !== 1) {
-                throw new BgaUserException($this->_("Illegal move: you can't divide the pieces into separate two groups"));
-            }
-
             $board[$x][$y] = null;
+
+            $components = $this->findConnectedComponents($board);
+            $componentsCount = count($components);
+
+            if ($componentsCount !== 1) {
+                throw new BgaUserException($this->_("Illegal move: you can't divide the pieces into separate two groups: $componentsCount, $index"));
+            }
         }
     }
 
