@@ -103,8 +103,9 @@ html {
 
 .nib_separators {
   display: flex;
-  height: calc(var(--pieceSize) / 5);
   flex-shrink: 0;
+  order: 2;
+  height: calc(var(--pieceSize) / 5);
 }
 
 .nib_separator {

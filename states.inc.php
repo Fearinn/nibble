@@ -33,7 +33,7 @@ $machinestates = array(
         "type" => "activeplayer",
         "args" => "argPlayerTurn",
         "possibleactions" => array("actTakeDiscs"),
-        "transitions" => array("betweenPlayers" => 3)
+        "transitions" => array("betweenPlayers" => 3, "zombiePass" => 3)
     ),
 
     3 => array(

@@ -161,18 +161,24 @@ define([
       for (const player_id in this.nib.info.players) {
         const player = this.nib.info.players[player_id];
 
-        const order = player_id == this.player_id ? -1 : 1;
-
         const collectionsElement = document.getElementById("nib_collections");
+
+        let order = player_id == this.player_id ? 1 : 3;
+        if (this.isSpectator) {
+          order = collectionsElement.childElementCount + 1;
+        }
+
+        const titleOrder = order === 1 ? - 1 : 1
+
         collectionsElement.innerHTML += `
           <div id="nib_collectionContainer:${player_id}"
           class="nib_collectionContainer" style="order: ${order};">
-            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}; order: ${order};">${player.name}</h3>
+            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}; order: ${titleOrder};">${player.name}</h3>
             <div id="nib_collection:${player_id}" class="nib_collection"></div>
           </div>
         `;
 
-        if (order === -1) {
+        if (collectionsElement.childElementCount === 1) {
           collectionsElement.innerHTML += `<div id="nib_separators:${player_id}" class="nib_separators"></div>`;
 
           const orderedColors = this.nib.info.orderedColors;
@@ -217,6 +223,8 @@ define([
           }
         );
 
+        const collectionContainer = document.getElementById(`nib_collectionContainer:${player_id}`);
+
         const collections = this.nib.globals.collections[player_id];
         for (const color_id in this.nib.info.colors) {
           const discs = collections?.[color_id];
@@ -234,6 +242,10 @@ define([
               return id == color_id;
             }
           );
+
+          if (collectionContainer.style.order == 1) {
+            slotElement.style.justifyContent = "flex-end";
+          }
         }
       }
 
