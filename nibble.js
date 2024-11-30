@@ -168,7 +168,7 @@ define([
           order = collectionsElement.childElementCount + 1;
         }
 
-        const titleOrder = order === 1 ? - 1 : 1
+        const titleOrder = order === 1 ? -1 : 1;
 
         collectionsElement.innerHTML += `
           <div id="nib_collectionContainer:${player_id}"
@@ -215,15 +215,25 @@ define([
           {
             center: false,
             direction: "row",
-            gap: "4px",
+            gap: "2px",
+            wrap: "nowrap",
             slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
             mapCardToSlot: (disc) => {
               return Number(disc.color_id);
             },
+            sort: (disc, otherDisc) => {
+              if (this.player_id == player_id) {
+                return -1;
+              }
+
+              return 1;
+            },
           }
         );
 
-        const collectionContainer = document.getElementById(`nib_collectionContainer:${player_id}`);
+        const collectionContainer = document.getElementById(
+          `nib_collectionContainer:${player_id}`
+        );
 
         const collections = this.nib.globals.collections[player_id];
         for (const color_id in this.nib.info.colors) {
