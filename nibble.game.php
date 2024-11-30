@@ -223,11 +223,10 @@ class Nibble extends Table
         }
 
         $this->globals->set("legalMoves", $legalMoves);
-
         return $legalMoves;
     }
 
-    public function isMoveLegal(array $board, int $x, int $y, ?int $activeColor)
+    public function isMoveLegal(array $board, int $x, int $y, ?int $activeColor): bool
     {
         $color = $board[$x][$y];
 
@@ -276,7 +275,6 @@ class Nibble extends Table
         } // Right
 
         if ($row == 0 && $col == 0) {
-            $this->dump("neighbors", $openNeighbors);
             return true;
         }
 
@@ -298,6 +296,8 @@ class Nibble extends Table
                 }
             }
         }
+
+        // throw new \BgaUserException(count($components));
 
         return $components;
     }
@@ -341,6 +341,10 @@ class Nibble extends Table
         $possible_positions = range(0, 8);
         $possible_colors = range(1, 9);
 
+        $board = $this->globals->get("board");
+        $components = [];
+        $visited = [];
+
         $currentColor = null;
         foreach ($discs as $disc) {
             foreach ($disc as $key => $value) {
@@ -365,6 +369,19 @@ class Nibble extends Table
             if ($currentColor !== $discColor) {
                 throw new BgaVisibleSystemException("Invalid discs input");
             }
+
+            $x = (int) $disc["row"];
+            $y = (int) $disc["column"];
+
+            $component = [];
+            $this->floodFill($board, $x, $y, $visited, $component);
+            $components[] = $component;
+
+            if (count($components) !== 1) {
+                throw new BgaUserException($this->_("Illegal move: you can't divide the pieces into separate two groups"));
+            }
+
+            $board[$x][$y] = null;
         }
     }
 
@@ -529,8 +546,7 @@ class Nibble extends Table
     //////////// Game state actions and arguments
     ////////////
 
-    public function stPlayerTurn(): void {
-    }
+    public function stPlayerTurn(): void {}
 
     public function argPlayerTurn(): array
     {
@@ -585,6 +601,112 @@ class Nibble extends Table
         }
 
         throw new feException("Zombie mode not supported at this game state: " . $statename);
+    }
+
+    public function debug_setBoard(): void
+    {
+        $board = [
+            0 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+            1 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => 2,
+                5 => 5,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+            2 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => 1,
+                4 => 3,
+                5 => 2,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+            3 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+            4 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+            5 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+            6 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+            7 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+            8 => [
+                0 => null,
+                1 => null,
+                2 => null,
+                3 => null,
+                4 => null,
+                5 => null,
+                6 => null,
+                7 => null,
+                8 => null,
+            ],
+        ];
+        $this->globals->set("board", $board);
     }
 
     ///////////////////////////////////////////////////////////////////////////////////:
