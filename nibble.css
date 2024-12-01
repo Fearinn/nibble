@@ -117,7 +117,7 @@ html {
 .nib_separator {
   flex-shrink: 0;
   height: 100%;
-  width: calc(var(--pieceSizeSM) + 4px);
+  width: calc(var(--pieceSizeSM) + 2px);
 }
 
 .nib_disc {
