@@ -230,6 +230,11 @@ class Nibble extends Table
     {
         $color = $board[$x][$y];
 
+        $piecesCount = (int) $this->piecesCount($board);
+        if ($piecesCount === 1) {
+            return true;
+        }
+
         if ($activeColor && $color != $activeColor) {
             return false;
         }
@@ -370,6 +375,10 @@ class Nibble extends Table
                 throw new BgaVisibleSystemException("Invalid discs input");
             }
 
+            if (count($discs) === 1) {
+                return;
+            }
+
             $x = (int) $disc["row"];
             $y = (int) $disc["column"];
             $board[$x][$y] = null;
@@ -383,8 +392,23 @@ class Nibble extends Table
         }
     }
 
-    public function majorityOfMajorities(): int
+    public function piecesCount(array $board): int
     {
+        $piecesCount = 0;
+        for ($x = 0; $x < 9; $x++) {
+            for ($y = 0; $y < 9; $y++) {
+                if ($board[$x][$y] !== null) {
+                    $piecesCount++;
+                }
+            }
+        }
+
+        return $piecesCount;
+    }
+
+    public function majorityOfMajorities(): int | null
+    {
+        $winner_id = null;
         $majorities = [];
         $collections = $this->globals->get("collections");
 
@@ -401,10 +425,49 @@ class Nibble extends Table
             }
         }
 
-        arsort($majorities);
-        $winner_id = key($majorities);
+        foreach ($majorities as $player_id => $majoritiesCount) {
+            if ($majoritiesCount >= 5) {
+                $winner_id = $player_id;
+            }
+        }
 
         return $winner_id;
+    }
+
+    public function canInstantWin(): bool
+    {
+        $orderedColors = $this->globals->get("orderedColors");
+        $collections = $this->globals->get("collections");
+
+        foreach ($collections as $player_id => $collection) {
+            $opponent_id = $this->getPlayerAfter($player_id);
+            $opponentCollection = $collections[$opponent_id];
+
+            $possibleAdjacent = 0;
+            foreach ($orderedColors as $color_id) {
+                $opponentDiscs = [];
+                if (array_key_exists($color_id, $opponentCollection)) {
+                    $opponentDiscs = $opponentCollection[$color_id];
+                }
+                $opponentDiscsCount = count($opponentDiscs);
+
+                if ($opponentDiscsCount === 0) {
+                    return true;
+                }
+
+                if ($opponentDiscsCount <= 2) {
+                    $possibleAdjacent++;
+                } else {
+                    $possibleAdjacent = 0;
+                }
+            }
+
+            if ($possibleAdjacent >= 3) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function isGameEnd(): bool
@@ -413,14 +476,7 @@ class Nibble extends Table
         $win_condition = null;
 
         $board = $this->globals->get("board");
-        $boardCount = 0;
-        for ($x = 0; $x < 9; $x++) {
-            for ($y = 0; $y < 9; $y++) {
-                if ($board[$x][$y] !== null) {
-                    $boardCount++;
-                }
-            }
-        }
+        $piecesCount = $this->piecesCount($board);
 
         $sevenOrMore = [];
         $collections = $this->globals->get("collections");
@@ -457,14 +513,19 @@ class Nibble extends Table
             }
         }
 
-        if ($boardCount === 0) {
+        $canInstaWin = $this->canInstantWin();
+
+        if ($piecesCount === 0 || !$canInstaWin) {
             $winner_id = $this->majorityOfMajorities();
+            if ($winner_id) {
+                $win_condition = clienttranslate("majority of majorities");
+            }
         }
 
         if ($winner_id) {
             $this->notifyAllPlayers(
                 "announceWinner",
-                clienttranslate('${player_name} wins the game by "${win_condition}"'),
+                clienttranslate('${player_name} wins the game by ${win_condition}'),
                 [
                     "player_id" => $winner_id,
                     "player_name" => $this->getPlayerNameById($winner_id),
@@ -607,7 +668,7 @@ class Nibble extends Table
             0 => [
                 0 => null,
                 1 => null,
-                2 => null,
+                2 => 1,
                 3 => null,
                 4 => null,
                 5 => null,
@@ -620,8 +681,8 @@ class Nibble extends Table
                 1 => null,
                 2 => null,
                 3 => null,
-                4 => 2,
-                5 => 5,
+                4 => null,
+                5 => null,
                 6 => null,
                 7 => null,
                 8 => null,
@@ -630,9 +691,9 @@ class Nibble extends Table
                 0 => null,
                 1 => null,
                 2 => null,
-                3 => 1,
-                4 => 3,
-                5 => 2,
+                3 => null,
+                4 => null,
+                5 => null,
                 6 => null,
                 7 => null,
                 8 => null,

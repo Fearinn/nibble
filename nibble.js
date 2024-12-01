@@ -343,6 +343,10 @@ define([
 
             args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`
           }
+
+          if (args.win_condition) {
+            args.win_condition = `<span class="nib_highlight-log">${args.win_condition}</span>`;
+          }
         }
       } catch (e) {
         console.error(log, args, "Exception thrown", e.stack);

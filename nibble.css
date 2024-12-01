@@ -138,6 +138,10 @@ html {
   border-radius: 0;
 }
 
+.nib_highlight-log {
+  font-weight: bold;
+}
+
 .nib_color-log {
   font-weight: bold;
   padding:0 2px;
