@@ -329,5 +329,26 @@ define([
 
       this.nib.selections.color = null;
     },
+
+    // @Override
+    format_string_recursive: function (log, args) {
+      try {
+        if (log && args && !args.processed) {
+          args.processed = true;
+
+          if (args.color_label && args.color_id) {
+            const color_id = args.color_id;
+            const color = this.nib.info.colors[color_id];
+            const backgroundColor = color === "white" ? "black" : "white";
+
+            args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`
+          }
+        }
+      } catch (e) {
+        console.error(log, args, "Exception thrown", e.stack);
+      }
+
+      return this.inherited(arguments);
+    },
   });
 });

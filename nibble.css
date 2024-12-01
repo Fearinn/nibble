@@ -138,6 +138,11 @@ html {
   border-radius: 0;
 }
 
+.nib_color-log {
+  font-weight: bold;
+  padding:0 2px;
+}
+
 body > .card {
   position: absolute;
   left: -9999px;
