@@ -49,6 +49,18 @@ define([
         9: "black",
       };
 
+      this.nib.info.colorblindHelp = {
+        1: "A",
+        2: "B",
+        3: "C",
+        4: "D",
+        5: "E",
+        6: "F",
+        7: "G",
+        8: "H",
+        9: "I",
+      }
+
       this.nib.version = gamedatas.version;
       this.nib.info.players = gamedatas.players;
       this.nib.info.orderedColors = gamedatas.orderedColors;
@@ -65,7 +77,8 @@ define([
         selectedCardClass: "nib_selectedDisc",
         getId: (card) => `disc-${card.row}${card.column}`,
         setupDiv: (card, div) => {
-          const color = this.nib.info.colors[card.color_id];
+          const color_id = card.color_id;
+          const color = this.nib.info.colors[color_id];
           div.classList.add("nib_disc");
           div.style.backgroundColor = color;
           div.style.gridRow = card.row + 1;
@@ -75,7 +88,7 @@ define([
           this.addTooltip(div.id, _(color), "");
 
           const colorblindHelp = document.createElement("span");
-          colorblindHelp.textContent = card.color_id;
+          colorblindHelp.textContent = this.nib.info.colorblindHelp[color_id];
           colorblindHelp.classList.add("nib_colorblindHelp");
           div.appendChild(colorblindHelp);
         },
@@ -188,8 +201,9 @@ define([
 
           orderedColors.forEach((color_id) => {
             const color = this.nib.info.colors[color_id];
+            const colorblindHelp = this.nib.info.colorblindHelp[color_id];
             separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color}">
-              <div class="nib_colorblindHelp">${color_id}</div>
+              <div class="nib_colorblindHelp">${colorblindHelp}</div>
             </div>`;
           });
 
