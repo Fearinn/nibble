@@ -111,13 +111,19 @@ html {
   display: flex;
   flex-shrink: 0;
   order: 2;
-  height: calc(var(--pieceSize) / 5);
+  height: calc(var(--pieceSize) / 4);
 }
 
 .nib_separator {
+  position: relative;
   flex-shrink: 0;
   height: 100%;
   width: calc(var(--pieceSizeSM) + 2px);
+}
+
+.nib_separator .nib_colorblindHelp {
+  font-size: 12px;
+  top: 0;
 }
 
 .nib_disc {

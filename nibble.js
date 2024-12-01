@@ -188,7 +188,9 @@ define([
 
           orderedColors.forEach((color_id) => {
             const color = this.nib.info.colors[color_id];
-            separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color}"></div>`;
+            separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color}">
+              <div class="nib_colorblindHelp">${color_id}</div>
+            </div>`;
           });
 
           orderedColors.forEach((color_id) => {
