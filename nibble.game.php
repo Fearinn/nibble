@@ -434,37 +434,35 @@ class Nibble extends Table
         return $winner_id;
     }
 
-    public function canInstantWin(): bool
+    public function canInstaWin(int $player_id): bool
     {
         $orderedColors = $this->globals->get("orderedColors");
         $collections = $this->globals->get("collections");
 
-        foreach ($collections as $player_id => $collection) {
-            $opponent_id = $this->getPlayerAfter($player_id);
-            $opponentCollection = $collections[$opponent_id];
+        $opponent_id = $this->getPlayerAfter($player_id);
+        $opponentCollection = $collections[$opponent_id];
 
-            $possibleAdjacent = 0;
-            foreach ($orderedColors as $color_id) {
-                $opponentDiscs = [];
-                if (array_key_exists($color_id, $opponentCollection)) {
-                    $opponentDiscs = $opponentCollection[$color_id];
-                }
-                $opponentDiscsCount = count($opponentDiscs);
-
-                if ($opponentDiscsCount === 0) {
-                    return true;
-                }
-
-                if ($opponentDiscsCount <= 2) {
-                    $possibleAdjacent++;
-                } else {
-                    $possibleAdjacent = 0;
-                }
+        $possibleAdjacent = 0;
+        foreach ($orderedColors as $color_id) {
+            $opponentDiscs = [];
+            if (array_key_exists($color_id, $opponentCollection)) {
+                $opponentDiscs = $opponentCollection[$color_id];
             }
+            $opponentDiscsCount = count($opponentDiscs);
 
-            if ($possibleAdjacent >= 3) {
+            if ($opponentDiscsCount === 0) {
                 return true;
             }
+
+            if ($opponentDiscsCount <= 2) {
+                $possibleAdjacent++;
+            } else {
+                $possibleAdjacent = 0;
+            }
+        }
+
+        if ($possibleAdjacent >= 3) {
+            return true;
         }
 
         return false;
@@ -513,16 +511,33 @@ class Nibble extends Table
             }
         }
 
-        $canInstaWin = $this->canInstantWin();
+        $majorityHolder_id = $this->majorityOfMajorities();
 
-        if ($piecesCount === 0 || !$canInstaWin) {
-            $winner_id = $this->majorityOfMajorities();
-            if ($winner_id) {
+        if ($majorityHolder_id !== null) {
+            $loser_id = $this->getPlayerAfter($majorityHolder_id);
+            $canInstaWin = $this->canInstaWin($loser_id);
+
+            if (!$canInstaWin) {
+                $this->notifyAllPlayers(
+                    "cantInstaWin",
+                    clienttranslate('${player_name} can no longer reach any instantenous win condition'),
+                    [
+                        "player_id" => $loser_id,
+                        "player_name" => $this->getPlayerNameById($loser_id),
+                    ]
+                );
+
+                $winner_id = $majorityHolder_id;
+                $win_condition = clienttranslate("majority of majorities");
+            }
+
+            if ($piecesCount === 0) {
+                $winner_id = $majorityHolder_id;
                 $win_condition = clienttranslate("majority of majorities");
             }
         }
 
-        if ($winner_id) {
+        if ($winner_id && $win_condition) {
             $this->notifyAllPlayers(
                 "announceWinner",
                 clienttranslate('${player_name} wins the game by ${win_condition}'),
