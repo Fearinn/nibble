@@ -35,7 +35,6 @@ define([
       this.nib.globals = {};
       this.nib.stocks = {};
       this.nib.selections = {};
-      this.nib.counters = {};
       this.nib.managers = {
         counters: {},
       };
@@ -71,6 +70,7 @@ define([
       this.nib.globals.board = gamedatas.board;
       this.nib.globals.legalMoves = gamedatas.legalMoves;
       this.nib.globals.collections = gamedatas.collections;
+      this.nib.counts = gamedatas.counts;
 
       this.nib.selections.color = null;
 
@@ -206,7 +206,9 @@ define([
         for (const color_id in counters) {
           const counter = counters[color_id];
           counter.create(`nib_count:${player_id}-${color_id}`);
-          counter.setValue(0);
+          
+          const count = this.nib.counts[player_id][color_id] || 0;
+          counter.setValue(count);
         }
 
         const collectionsElement = document.getElementById("nib_collections");
@@ -369,13 +371,16 @@ define([
       console.log("notifications subscriptions setup");
 
       dojo.subscribe("takeDisc", this, "notif_takeDisc");
+      this.notifqueue.setSynchronous("takeDisc", 500);
     },
 
     notif_takeDisc: function (notif) {
       const player_id = notif.args.player_id;
       const disc = notif.args.disc;
+      const color_id = notif.args.color_id;
 
       this.nib.stocks[player_id].collection.addCard(disc);
+      this.nib.managers.counters[player_id][color_id].incValue(1);
 
       this.nib.selections.color = null;
     },

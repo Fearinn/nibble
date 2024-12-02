@@ -27,7 +27,7 @@ class Nibble extends Table
     {
         parent::__construct();
 
-        $this->initGameStateLabels(array());
+        $this->initGameStateLabels([]);
     }
 
     protected function getGameName()
@@ -36,7 +36,7 @@ class Nibble extends Table
         return "nibble";
     }
 
-    protected function setupNewGame($players, $options = array())
+    protected function setupNewGame($players, $options = [])
     {
         $gameinfos = $this->getGameinfos();
         $default_colors = $gameinfos['player_colors'];
@@ -44,7 +44,7 @@ class Nibble extends Table
         // Create players
         // Note: if you added some extra field on "player" table in the database (dbmodel.sql), you can initialize it there.
         $sql = "INSERT INTO player (player_id, player_color, player_canal, player_name, player_avatar) VALUES ";
-        $values = array();
+        $values = [];
         foreach ($players as $player_id => $player) {
             $color = array_shift($default_colors);
             $values[] = "('" . $player_id . "','$color','" . $player['player_canal'] . "','" . addslashes($player['player_name']) . "','" . addslashes($player['player_avatar']) . "')";
@@ -55,6 +55,11 @@ class Nibble extends Table
         $this->reloadPlayersBasicInfos();
 
         /************ Start the game initialization *****/
+        foreach ($players as $player_id => $player) {
+            foreach ($this->colors_info as $color_id => $color) {
+                $this->initStat("player", "$color_id:collected", 0, $player_id);
+            }
+        }
 
         function isSafeColor($board, $row, $col, $color): bool
         {
@@ -162,19 +167,20 @@ class Nibble extends Table
     */
     protected function getAllDatas()
     {
-        $result = array();
+        $result = [];
 
         $current_player_id = $this->getCurrentPlayerId();    // !! We must only return informations visible by this player !!
 
         $sql = "SELECT player_id id, player_score score FROM player";
-        $result = array(
+        $result = [
             "version" => (int) $this->gamestate->table_globals[300],
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
             "orderedColors" => $this->globals->get("orderedColors"),
             "legalMoves" => $this->calcLegalMoves(),
             "collections" => $this->globals->get("collections"),
-        );
+            "counts" => $this->getCounts(),
+        ];
 
         return $result;
     }
@@ -209,7 +215,7 @@ class Nibble extends Table
             }
         }
 
-        $legalMoves = array();
+        $legalMoves = [];
 
         $board = $this->globals->get("board");
         $activeColor = $this->globals->get("activeColor");
@@ -217,7 +223,7 @@ class Nibble extends Table
         foreach ($board as $rowId => $row) {
             foreach ($row as $columnId => $color) {
                 if ($this->isMoveLegal($board, $rowId, $columnId, $activeColor)) {
-                    $legalMoves[] = array("row" => $rowId, "column" => $columnId, "color_id" => $color);
+                    $legalMoves[] = ["row" => $rowId, "column" => $columnId, "color_id" => $color];
                 };
             }
         }
@@ -342,7 +348,7 @@ class Nibble extends Table
             throw new BgaVisibleSystemException("Invalid discs input");
         }
 
-        $possible_keys = array("row", "column", "color_id");
+        $possible_keys = ["row", "column", "color_id"];
         $possible_positions = range(0, 8);
         $possible_colors = range(1, 9);
 
@@ -390,6 +396,34 @@ class Nibble extends Table
                 throw new BgaUserException($this->_("Illegal move: you can't divide the pieces into separate two groups: $componentsCount, $index"));
             }
         }
+    }
+
+    public function getCounts(?int $player_id = null): array
+    {
+        $counts = [];
+        $collections = $this->globals->get("collections");
+
+        if ($player_id) {
+            $collection = $collections[$player_id];
+
+            foreach ($collection as $color_id => $discs) {
+                $counts[$color_id] = count($discs);
+            }
+
+            return $counts;
+        }
+
+        $players = $this->loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            $counts[$player_id] = [];
+            $collection = $collections[$player_id];
+
+            foreach ($collection as $color_id => $discs) {
+                $counts[$player_id][$color_id] = count($discs);
+            }
+        }
+
+        return $counts;
     }
 
     public function piecesCount(array $board): int
@@ -611,6 +645,7 @@ class Nibble extends Table
             );
         }
 
+        $this->incStat(1, "$disc_color:collected", $player_id);
         $this->globals->set("board", $board);
         $this->gamestate->nextState("betweenPlayers");
     }
@@ -624,10 +659,10 @@ class Nibble extends Table
 
     public function argPlayerTurn(): array
     {
-        return array(
+        return [
             "legalMoves" => $this->globals->get("legalMoves"),
             "activeColor" => $this->globals->get("activeColor"),
-        );
+        ];
     }
 
     public function stBetweenPlayers(): void

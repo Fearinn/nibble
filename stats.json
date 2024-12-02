@@ -1,1 +1,49 @@
-{}
+{
+  "player": {
+    "1:collected": {
+      "id": 10,
+      "name": "Green pieces collected",
+      "type": "int"
+    },
+    "2:collected": {
+      "id": 11,
+      "name": "Purple pieces collected",
+      "type": "int"
+    },
+    "3:collected": {
+      "id": 12,
+      "name": "Red pieces collected",
+      "type": "int"
+    },
+    "4:collected": {
+      "id": 13,
+      "name": "Yellow pieces collected",
+      "type": "int"
+    },
+    "5:collected": {
+      "id": 14,
+      "name": "Orange pieces collected",
+      "type": "int"
+    },
+    "6:collected": {
+      "id": 15,
+      "name": "Blue pieces collected",
+      "type": "int"
+    },
+    "7:collected": {
+      "id": 16,
+      "name": "White pieces collected",
+      "type": "int"
+    },
+    "8:collected": {
+      "id": 17,
+      "name": "Gray pieces collected",
+      "type": "int"
+    },
+    "9:collected": {
+      "id": 18,
+      "name": "Black pieces collected",
+      "type": "int"
+    }
+  }
+}
