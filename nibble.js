@@ -33,9 +33,12 @@ define([
       this.nib = {};
       this.nib.info = {};
       this.nib.globals = {};
-      this.nib.managers = {};
       this.nib.stocks = {};
       this.nib.selections = {};
+      this.nib.counters = {};
+      this.nib.managers = {
+        counters: {},
+      };
 
       this.nib.info.colors = {
         1: "green",
@@ -59,7 +62,7 @@ define([
         7: "G",
         8: "H",
         9: "I",
-      }
+      };
 
       this.nib.version = gamedatas.version;
       this.nib.info.players = gamedatas.players;
@@ -174,8 +177,39 @@ define([
       for (const player_id in this.nib.info.players) {
         const player = this.nib.info.players[player_id];
 
-        const collectionsElement = document.getElementById("nib_collections");
+        const playerPanel = this.getPlayerPanelElement(player_id);
+        playerPanel.innerHTML += `
+          <div id="nib_counters:${player_id}" class="nib_counters"></div>
+        `;
 
+        const countersElement = document.getElementById(
+          `nib_counters:${player_id}`
+        );
+
+        this.nib.managers.counters[player_id] = {};
+
+        const orderedColors = this.nib.info.orderedColors;
+        orderedColors.forEach((color_id) => {
+          this.nib.managers.counters[player_id][color_id] = new ebg.counter();
+
+          const color = this.nib.info.colors[color_id];
+          const colorblindHelp = this.nib.info.colorblindHelp[color_id];
+          countersElement.innerHTML += `<div id="nib_counter:${player_id}-${color_id}" class="nib_counter">
+            <div class="nib_disc-counter nib_disc" style="background-color: ${color}">
+              <span class="nib_colorblindHelp">${colorblindHelp}</span>
+            </div>
+            <span id="nib_count:${player_id}-${color_id}" class="nib_count">0</span>
+          </div>`;
+        });
+
+        const counters = this.nib.managers.counters[player_id];
+        for (const color_id in counters) {
+          const counter = counters[color_id];
+          counter.create(`nib_count:${player_id}-${color_id}`);
+          counter.setValue(0);
+        }
+
+        const collectionsElement = document.getElementById("nib_collections");
         let order = player_id == this.player_id ? 1 : 3;
         if (this.isSpectator) {
           order = collectionsElement.childElementCount + 1;
@@ -203,7 +237,7 @@ define([
             const color = this.nib.info.colors[color_id];
             const colorblindHelp = this.nib.info.colorblindHelp[color_id];
             separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color}">
-              <div class="nib_colorblindHelp">${colorblindHelp}</div>
+              <span class="nib_colorblindHelp">${colorblindHelp}</span>
             </div>`;
           });
 
@@ -357,7 +391,7 @@ define([
             const color = this.nib.info.colors[color_id];
             const backgroundColor = color === "white" ? "black" : "white";
 
-            args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`
+            args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`;
           }
 
           if (args.win_condition) {
