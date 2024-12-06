@@ -185,11 +185,11 @@ class Nibble extends Table
         return $result;
     }
 
-    public function getGameProgression()
+    public function getGameProgression(): int
     {
-        // TODO: compute and return the game progression
-
-        return 0;
+        $board = $this->globals->get("board");
+        $progression = 1 - $this->piecesCount($board) / 81;
+        return round($progression * 100);
     }
 
 
