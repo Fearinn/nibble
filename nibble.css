@@ -30,13 +30,13 @@ html {
 
 .nib_colorblind .nib_colorblindHelp {
   display: block;
-  position: absolute;
+  position: relative;
   left: 37%;
   top: 33%;
   background-color: white;
   text-align: center;
   padding: 1px;
-  width: 25%;
+  width: 27%;
 }
 
 .nib_square .nib_disc,
@@ -108,6 +108,10 @@ html {
   width: var(--pieceSizeSM);
 }
 
+.nib_collection .nib_colorblindHelp {
+  display: none;
+}
+
 .nib_separators {
   display: flex;
   flex-shrink: 0;
@@ -166,6 +170,8 @@ html {
 }
 
 .nib_counter .nib_colorblindHelp {
+  left: 34%;
+  top: 25%;
   font-size: 12px;
 }
 
