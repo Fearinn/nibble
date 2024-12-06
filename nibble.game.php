@@ -308,8 +308,6 @@ class Nibble extends Table
             }
         }
 
-        // throw new \BgaUserException(count($components));
-
         return $components;
     }
 
@@ -502,7 +500,7 @@ class Nibble extends Table
         return false;
     }
 
-    public function isGameEnd(): bool
+    public function isGameEnd($player_id): bool
     {
         $winner_id = null;
         $win_condition = null;
@@ -511,37 +509,36 @@ class Nibble extends Table
         $piecesCount = $this->piecesCount($board);
 
         $sevenOrMore = [];
-        $collections = $this->globals->get("collections");
+        $collection = $this->globals->get("collections")[$player_id];
         $orderedColors = $this->globals->get("orderedColors");
+
+        $sevenOrMore = 0;
+
         foreach ($orderedColors as $color_id) {
-            foreach ($collections as $player_id => $collection) {
-                $discs = [];
+            $discs = [];
 
-                if (array_key_exists($color_id, $collection)) {
-                    $discs = $collection[$color_id];
-                }
+            if (array_key_exists($color_id, $collection)) {
+                $discs = $collection[$color_id];
+            }
 
-                $discsCount = count($discs);
+            $discsCount = count($discs);
 
-                if ($discsCount === 9) {
-                    $winner_id = $player_id;
-                    $win_condition = clienttranslate("9 pieces of one color");
-                    break;
-                }
+            if ($discsCount === 9) {
+                $winner_id = $player_id;
+                $win_condition = clienttranslate("9 pieces of one color");
+                break;
+            }
 
+            if ($discsCount >= 7) {
+                $sevenOrMore++;
+            } else {
                 $sevenOrMore = 0;
+            }
 
-                if ($discsCount >= 7) {
-                    $sevenOrMore++;
-                } else {
-                    $sevenOrMore = 0;
-                }
-
-                if ($sevenOrMore === 3) {
-                    $winner_id = $player_id;
-                    $win_condition = clienttranslate("7 pieces of three adjacent colors");
-                    break;
-                }
+            if ($sevenOrMore === 3) {
+                $winner_id = $player_id;
+                $win_condition = clienttranslate("7 or more pieces of three adjacent colors");
+                break;
             }
         }
 
@@ -669,7 +666,7 @@ class Nibble extends Table
     {
         $player_id = (int) $this->getActivePlayerId();
 
-        if ($this->isGameEnd()) {
+        if ($this->isGameEnd($player_id)) {
             $this->gamestate->nextState("gameEnd");
             return;
         }
