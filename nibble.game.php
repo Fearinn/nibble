@@ -56,7 +56,7 @@ class Nibble extends Table
 
         /************ Start the game initialization *****/
         foreach ($players as $player_id => $player) {
-            $this->initStat("player", "piecesCollected", $player_id);
+            $this->initStat("player", "piecesCollected", 0, $player_id);
 
             foreach ($this->colors_info as $color_id => $color) {
                 $this->initStat("player", "$color_id:collected", 0, $player_id);
