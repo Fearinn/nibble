@@ -1,5 +1,10 @@
 {
   "player": {
+    "piecesCollected": {
+      "id": 19,
+      "name": "Total pieces collected",
+      "type": "int"
+    },
     "1:collected": {
       "id": 10,
       "name": "Green pieces collected",
