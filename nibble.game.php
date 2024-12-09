@@ -640,9 +640,10 @@ class Nibble extends Table
                     "color_id" => $activeColor,
                 ]
             );
+
+            $this->incStat(1, "$disc_color:collected", $player_id);
         }
 
-        $this->incStat(1, "$disc_color:collected", $player_id);
         $this->globals->set("board", $board);
         $this->gamestate->nextState("betweenPlayers");
     }
