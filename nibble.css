@@ -13,8 +13,6 @@
  *
  */
 
-@import url("modules/bga-cards.css");
-
 html {
   --pieceSize: 60px;
   --pieceSizeSM: 30px;
