@@ -629,7 +629,7 @@ class Nibble extends Table
 
             $this->notifyAllPlayers(
                 "takeDisc",
-                clienttranslate('${player_name} takes a ${color_label} piece from position (${row}, ${column})'),
+                clienttranslate('${player_name} takes a ${color_label} piece from position (${column}, ${row})'),
                 [
                     "player_id" => $player_id,
                     "player_name" => $this->getPlayerNameById($player_id),

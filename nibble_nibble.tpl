@@ -12,7 +12,31 @@
 
 <div id="nib_gameArea" class="nib_gameArea">
   <div id="nib_collections" class="nib_collections whiteblock"></div>
-  <div id="nib_board" class="nib_board whiteblock"></div>
+  <div id="nib_boardContainer" class="nib_boardContainer whiteblock">
+    <div id="nib_xAxis" class="nib_xAxis">
+      <div id="nib_xAxis-1" class="nib_axisNumber">1</div>
+      <div id="nib_xAxis-2" class="nib_axisNumber">2</div>
+      <div id="nib_xAxis-3" class="nib_axisNumber">3</div>
+      <div id="nib_xAxis-4" class="nib_axisNumber">4</div>
+      <div id="nib_xAxis-5" class="nib_axisNumber">5</div>
+      <div id="nib_xAxis-6" class="nib_axisNumber">6</div>
+      <div id="nib_xAxis-7" class="nib_axisNumber">7</div>
+      <div id="nib_xAxis-8" class="nib_axisNumber">8</div>
+      <div id="nib_xAxis-9" class="nib_axisNumber">9</div>
+    </div>
+    <div id="nib_yAxis" class="nib_yAxis">
+      <div id="nib_yAxis-1" class="nib_axisNumber">1</div>
+      <div id="nib_yAxis-2" class="nib_axisNumber">2</div>
+      <div id="nib_yAxis-3" class="nib_axisNumber">3</div>
+      <div id="nib_yAxis-4" class="nib_axisNumber">4</div>
+      <div id="nib_yAxis-5" class="nib_axisNumber">5</div>
+      <div id="nib_yAxis-6" class="nib_axisNumber">6</div>
+      <div id="nib_yAxis-7" class="nib_axisNumber">7</div>
+      <div id="nib_yAxis-8" class="nib_axisNumber">8</div>
+      <div id="nib_yAxis-9" class="nib_axisNumber">9</div>
+    </div>
+    <div id="nib_board" class="nib_board"></div>
+  </div>
 </div>
 
 <script type="text/javascript"></script>

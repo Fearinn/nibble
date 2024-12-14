@@ -61,7 +61,45 @@ html {
   margin: 0;
 }
 
+.nib_boardContainer {
+  display: grid;
+  grid-template-areas: 
+  ". x x x x x x x x x"
+  "y a a a a a a a a a"
+  "y a a a a a a a a a"
+  "y a a a a a a a a a"
+  "y a a a a a a a a a"
+  "y a a a a a a a a a"
+  "y a a a a a a a a a"
+  "y a a a a a a a a a"
+  "y a a a a a a a a a"
+  "y a a a a a a a a a";
+  gap: 8px;
+}
+
+.nib_xAxis {
+  display: grid;
+  grid-area: x;
+  grid-template-columns: repeat(9, var(--pieceSize));
+  gap: 4px;
+}
+
+.nib_yAxis {
+  display: grid;
+  grid-area: y;
+  grid-template-rows: repeat(9, var(--pieceSize));
+  gap: 4px;
+  vertical-align: middle;
+}
+
+.nib_axisNumber {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
 .nib_board {
+  grid-area: a;
   display: grid;
   grid-template-rows: repeat(9, var(--pieceSize));
   grid-template-columns: repeat(9, var(--pieceSize));
