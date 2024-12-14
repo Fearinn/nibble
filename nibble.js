@@ -394,7 +394,7 @@ define([
           if (args.color_label && args.color_id) {
             const color_id = args.color_id;
             const color = this.nib.info.colors[color_id];
-            const backgroundColor = color === "white" ? "black" : "white";
+            const backgroundColor = color === "white" || color === "yellow" ? "black" : "white";
 
             args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`;
           }
