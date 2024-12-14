@@ -1,13 +1,13 @@
 {
   "100": {
-    "name": "Colorblind Support",
+    "name": "Colorblind support",
     "needReload": true,
     "values": {
       "0": {
-        "name": "Off"
+        "name": "Disabled"
       },
       "1": {
-        "name": "On",
+        "name": "Enabled",
         "cssPref": "nib_colorblind"
       }
     },
@@ -26,5 +26,19 @@
       }
     },
     "default": 2
+  },
+  "102": {
+    "name": "Reduce brightness",
+    "needReload": true,
+    "values": {
+      "0": {
+        "name": "Disabled"
+      },
+      "1": {
+        "name": "Enabled",
+        "cssPref": "nib_reduceBrightness"
+      }
+    },
+    "default": 0
   }
 }

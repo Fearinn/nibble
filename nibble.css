@@ -47,6 +47,14 @@ html {
   border-radius: 100% !important;
 }
 
+.nib_reduceBrightness .nib_disc, .nib_reduceBrightness .nib_separator, .nib_reduceBrightness .nib_color-log {
+  filter: brightness(0.75);
+}
+
+.nib_reduceBrightness .nib_disc.bga-cards_disabled-card {
+  filter: contrast(0.6) brightness(0.75) !important;
+}
+
 .nib_gameArea {
   display: flex;
   align-items: center;
@@ -63,17 +71,17 @@ html {
 
 .nib_boardContainer {
   display: grid;
-  grid-template-areas: 
-  ". x x x x x x x x x"
-  "y a a a a a a a a a"
-  "y a a a a a a a a a"
-  "y a a a a a a a a a"
-  "y a a a a a a a a a"
-  "y a a a a a a a a a"
-  "y a a a a a a a a a"
-  "y a a a a a a a a a"
-  "y a a a a a a a a a"
-  "y a a a a a a a a a";
+  grid-template-areas:
+    ". x x x x x x x x x"
+    "y a a a a a a a a a"
+    "y a a a a a a a a a"
+    "y a a a a a a a a a"
+    "y a a a a a a a a a"
+    "y a a a a a a a a a"
+    "y a a a a a a a a a"
+    "y a a a a a a a a a"
+    "y a a a a a a a a a"
+    "y a a a a a a a a a";
   gap: 8px;
 }
 
