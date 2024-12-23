@@ -194,7 +194,6 @@ class Nibble extends Table
         return round($progression * 100);
     }
 
-
     //////////////////////////////////////////////////////////////////////////////
     //////////// Utility functions
     //////////// 
@@ -490,13 +489,13 @@ class Nibble extends Table
 
             if ($opponentDiscsCount <= 2) {
                 $possibleAdjacent++;
+
+                if ($possibleAdjacent >= 3) {
+                    return true;
+                }
             } else {
                 $possibleAdjacent = 0;
             }
-        }
-
-        if ($possibleAdjacent >= 3) {
-            return true;
         }
 
         return false;
@@ -711,6 +710,10 @@ class Nibble extends Table
         }
 
         throw new feException("Zombie mode not supported at this game state: " . $statename);
+    }
+
+    public function debug_canInstaWin(int $player_id): bool {
+        return $this->canInstaWin($player_id);
     }
 
     public function debug_setBoard(): void
