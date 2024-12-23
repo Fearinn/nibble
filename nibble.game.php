@@ -157,16 +157,7 @@ class Nibble extends Table
 
         /************ End of the game initialization *****/
     }
-
-    /*
-        getAllDatas: 
-        
-        Gather all informations about current game situation (visible by the current player).
-        
-        The method is called each time the game interface is displayed to a player, ie:
-        _ when the game starts
-        _ when a player refreshes the game page (F5)
-    */
+    
     protected function getAllDatas()
     {
         $result = [];
@@ -182,6 +173,7 @@ class Nibble extends Table
             "legalMoves" => $this->calcLegalMoves(),
             "collections" => $this->globals->get("collections"),
             "counts" => $this->getCounts(),
+            "playersNoInstaWin" => $this->globals->get("playersNoInstaWin", []),
         ];
 
         return $result;
@@ -501,6 +493,48 @@ class Nibble extends Table
         return false;
     }
 
+    public function getPlayersInstaWin(): array
+    {
+        $players = $this->loadPlayersBasicInfos();
+
+        $playersInstaWin = [];
+        foreach ($players as $player_id => $player) {
+            $playersInstaWin[$player_id] = $this->canInstaWin($player_id);
+        }
+
+        return $playersInstaWin;
+    }
+
+    public function updateWinConWarn(): void
+    {
+        $playersNoInstaWin = $this->globals->get("playersNoInstaWin", []);
+        $updated = false;
+
+        $players = $this->loadPlayersBasicInfos();
+        foreach ($players as $player_id => $player) {
+            $canInstaWin = $this->canInstaWin($player_id);
+
+            if ($canInstaWin || in_array($player_id, $playersNoInstaWin)) {
+                continue;
+            }
+
+            $playersNoInstaWin[] = $player_id;
+            $updated = true;
+        }
+
+        if ($updated) {
+            $this->notifyAllPlayers(
+                "updateWinConWarn",
+                "",
+                [
+                    "playersNoInstaWin" => $playersNoInstaWin,
+                ]
+            );
+        }
+
+        $this->globals->set("playersNoInstaWin", $playersNoInstaWin);
+    }
+
     public function isGameEnd($player_id): bool
     {
         $winner_id = null;
@@ -549,21 +583,7 @@ class Nibble extends Table
             $loser_id = $this->getPlayerAfter($majorityHolder_id);
             $canInstaWin = $this->canInstaWin($loser_id);
 
-            if (!$canInstaWin) {
-                $this->notifyAllPlayers(
-                    "cantInstaWin",
-                    clienttranslate('${player_name} can no longer reach any instantenous win condition'),
-                    [
-                        "player_id" => $loser_id,
-                        "player_name" => $this->getPlayerNameById($loser_id),
-                    ]
-                );
-
-                $winner_id = $majorityHolder_id;
-                $win_condition = clienttranslate("majority of majorities");
-            }
-
-            if ($piecesCount === 0) {
+            if (!$canInstaWin || $piecesCount === 0) {
                 $winner_id = $majorityHolder_id;
                 $win_condition = clienttranslate("majority of majorities");
             }
@@ -669,6 +689,8 @@ class Nibble extends Table
     {
         $player_id = (int) $this->getActivePlayerId();
 
+        $this->updateWinConWarn();
+
         if ($this->isGameEnd($player_id)) {
             $this->gamestate->nextState("gameEnd");
             return;
@@ -712,7 +734,8 @@ class Nibble extends Table
         throw new feException("Zombie mode not supported at this game state: " . $statename);
     }
 
-    public function debug_canInstaWin(int $player_id): bool {
+    public function debug_canInstaWin(int $player_id): bool
+    {
         return $this->canInstaWin($player_id);
     }
 

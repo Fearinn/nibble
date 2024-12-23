@@ -70,8 +70,9 @@ define([
       this.nib.globals.board = gamedatas.board;
       this.nib.globals.legalMoves = gamedatas.legalMoves;
       this.nib.globals.collections = gamedatas.collections;
-      this.nib.counts = gamedatas.counts;
+      this.nib.globals.playersNoInstaWin = gamedatas.playersNoInstaWin;
 
+      this.nib.counts = gamedatas.counts;
       this.nib.selections.color = null;
 
       this.nib.managers.discs = new CardManager(this, {
@@ -99,6 +100,9 @@ define([
         setupBackDiv: (card, div) => {},
       });
 
+      this.updateWinConWarn(this.nib.globals.playersNoInstaWin);
+
+      /* BOARD */
       const boardElement = document.getElementById("nib_board");
 
       this.nib.stocks.board = new CardStock(
@@ -206,7 +210,7 @@ define([
         for (const color_id in counters) {
           const counter = counters[color_id];
           counter.create(`nib_count:${player_id}-${color_id}`);
-          
+
           const count = this.nib.counts[player_id][color_id] || 0;
           counter.setValue(count);
         }
@@ -356,6 +360,32 @@ define([
       this.bgaPerformAction(action, args);
     },
 
+    updateWinConWarn: function (playersNoInstaWin) {
+      const winConWarnElement = document.getElementById("nib_winConWarn");
+      warn = _("Both players can still reach an instantaneous win condition");
+
+      if (playersNoInstaWin.length === 2) {
+        warn = _("Both players can no longer reach any instantaneous win condition. Fight for the majorities!");
+        winConWarnElement.style.backgroundColor = "yellow";
+      }
+
+      if (playersNoInstaWin.length === 1) {
+        if (playersNoInstaWin.includes(this.player_id)) {
+          warn = _(
+            "You can no longer reach any instantaneous win condition. Fight for the majorities!"
+          );
+          winConWarnElement.style.backgroundColor = "red";
+        } else {
+          warn = _(
+            "Your opponent can no longer reach any instantaneous win condition"
+          );
+          winConWarnElement.style.backgroundColor = "green";
+        }
+      }
+
+      winConWarnElement.textContent = warn;
+    },
+
     ///////////////////////////////////////////////////
     //// Player's action
 
@@ -371,6 +401,7 @@ define([
       console.log("notifications subscriptions setup");
 
       dojo.subscribe("takeDisc", this, "notif_takeDisc");
+      dojo.subscribe("updateWinConWarn", this, "notif_updateWinConWarn");
       this.notifqueue.setSynchronous("takeDisc", 500);
     },
 
@@ -385,6 +416,11 @@ define([
       this.nib.selections.color = null;
     },
 
+    notif_updateWinConWarn: function (notif) {
+      const playersNoInstaWin = notif.args.playersNoInstaWin;
+      this.updateWinConWarn(playersNoInstaWin);
+    },
+
     // @Override
     format_string_recursive: function (log, args) {
       try {
@@ -394,7 +430,8 @@ define([
           if (args.color_label && args.color_id) {
             const color_id = args.color_id;
             const color = this.nib.info.colors[color_id];
-            const backgroundColor = color === "white" || color === "yellow" ? "black" : "white";
+            const backgroundColor =
+              color === "white" || color === "yellow" ? "black" : "white";
 
             args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`;
           }
@@ -409,6 +446,5 @@ define([
 
       return this.inherited(arguments);
     },
-    
   });
 });
