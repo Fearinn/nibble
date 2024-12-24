@@ -362,22 +362,22 @@ define([
 
     updateWinConWarn: function (playersNoInstaWin) {
       const winConWarnElement = document.getElementById("nib_winConWarn");
-      warn = _("Both players can still reach an instantaneous win condition");
+      warn = _("Both players can still get an instant win");
 
       if (playersNoInstaWin.length === 2) {
-        warn = _("Both players can no longer reach any instantaneous win condition. Fight for the majorities!");
+        warn = _("Both players can no longer get an instant win. Go for the majorities!");
         winConWarnElement.style.backgroundColor = "yellow";
       }
 
       if (playersNoInstaWin.length === 1) {
         if (playersNoInstaWin.includes(this.player_id)) {
           warn = _(
-            "You can no longer reach any instantaneous win condition. Fight for the majorities!"
+            "You can no longer get an instant win. Go for the majorities!"
           );
           winConWarnElement.style.backgroundColor = "red";
         } else {
           warn = _(
-            "Your opponent can no longer reach any instantaneous win condition"
+            "Your opponent can no longer get an instant win"
           );
           winConWarnElement.style.backgroundColor = "green";
         }
