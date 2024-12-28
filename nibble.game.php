@@ -384,7 +384,7 @@ class Nibble extends Table
             $componentsCount = count($components);
 
             if ($componentsCount !== 1) {
-                throw new BgaUserException($this->_("Illegal move: you can't divide the pieces into separate two groups: $componentsCount, $index"));
+                throw new BgaUserException($this->_("Illegal move: you can't divide the pieces into separate two groups"));
             }
         }
     }
