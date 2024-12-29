@@ -51,6 +51,15 @@ define([
         9: "black",
       };
 
+      this.nib.info.darkColors = {
+        1: "green",
+        2: "purple",
+        3: "red",
+        6: "blue",
+        8: "gray",
+        9: "black",
+      };
+
       this.nib.info.colorblindHelp = {
         1: "A",
         2: "B",
@@ -94,6 +103,10 @@ define([
           const colorblindHelp = document.createElement("span");
           colorblindHelp.textContent = this.nib.info.colorblindHelp[color_id];
           colorblindHelp.classList.add("nib_colorblindHelp");
+          colorblindHelp.style.color = this.nib.info.darkColors[color_id]
+            ? "white"
+            : "black";
+
           div.appendChild(colorblindHelp);
         },
         setupFrontDiv: (card, div) => {},
@@ -198,9 +211,13 @@ define([
 
           const color = this.nib.info.colors[color_id];
           const colorblindHelp = this.nib.info.colorblindHelp[color_id];
+          const colorblindHelpColor = this.nib.info.darkColors[color_id]
+            ? "white"
+            : "black";
+
           countersElement.innerHTML += `<div id="nib_counter:${player_id}-${color_id}" class="nib_counter">
             <div class="nib_disc-counter nib_disc" style="background-color: ${color}">
-              <span class="nib_colorblindHelp">${colorblindHelp}</span>
+              <span class="nib_colorblindHelp" style="color: ${colorblindHelpColor}">${colorblindHelp}</span>
             </div>
             <span id="nib_count:${player_id}-${color_id}" class="nib_count">0</span>
           </div>`;
@@ -242,8 +259,12 @@ define([
           orderedColors.forEach((color_id) => {
             const color = this.nib.info.colors[color_id];
             const colorblindHelp = this.nib.info.colorblindHelp[color_id];
+            const colorblindHelpColor = this.nib.info.darkColors[color_id]
+              ? "white"
+              : "black";
+
             separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color}">
-              <span class="nib_colorblindHelp">${colorblindHelp}</span>
+              <span class="nib_colorblindHelp" style="color: ${colorblindHelpColor}">${colorblindHelp}</span>
             </div>`;
           });
 
@@ -365,7 +386,9 @@ define([
       warn = _("Both players can still get an instant win");
 
       if (playersNoInstaWin.length === 2) {
-        warn = _("Both players can no longer get an instant win. Go for the majorities!");
+        warn = _(
+          "Both players can no longer get an instant win. Go for the majorities!"
+        );
         winConWarnElement.style.backgroundColor = "yellow";
       }
 
@@ -376,9 +399,7 @@ define([
           );
           winConWarnElement.style.backgroundColor = "red";
         } else {
-          warn = _(
-            "Your opponent can no longer get an instant win"
-          );
+          warn = _("Your opponent can no longer get an instant win");
           winConWarnElement.style.backgroundColor = "green";
         }
       }
