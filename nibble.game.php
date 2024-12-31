@@ -27,7 +27,12 @@ class Nibble extends Table
     {
         parent::__construct();
 
-        $this->initGameStateLabels([]);
+        $this->initGameStateLabels(
+            [
+                "variant" => 100,
+                "boardFormat" => 101,
+            ]
+        );
     }
 
     protected function getGameName()
@@ -58,90 +63,18 @@ class Nibble extends Table
         foreach ($players as $player_id => $player) {
             $this->initStat("player", "piecesCollected", 0, $player_id);
 
-            foreach ($this->colors_info as $color_id => $color) {
+            foreach ($this->colorsInfo() as $color_id => $color) {
                 $this->initStat("player", "$color_id:collected", 0, $player_id);
             }
         }
 
-        function isSafeColor($board, $row, $col, $color): bool
-        {
-            // Check the orthogonal neighbors (up, down, left, right)
-            $rows = count($board);
-            $cols = count($board[0]);
+        $colorsNumber = $this->colorsNumber();
+        $boardSize = $colorsNumber;
 
-            if ($row > 0 && $board[$row - 1][$col] === $color) {
-                return false;
-            } // Up
-
-            if ($row < $rows - 1 && $board[$row + 1][$col] === $color) {
-                return false;
-            } // Down
-
-            if ($col > 0 && $board[$row][$col - 1] === $color) {
-                return false;
-            } // Left
-
-            if ($col < $cols - 1 && $board[$row][$col + 1] === $color) {
-                return false;
-            } // Right
-
-            return true;
-        }
-
-        function placeDiscs(&$board, &$colorCounts, $colors, $row = 0, $col = 0): bool
-        {
-            $rows = count($board);
-            $cols = count($board[0]);
-
-            if ($row == $rows) {
-                return true;
-            } // All rows are processed
-
-            // Move to the next row when the end of a column is reached
-            $nextRow = $col == $cols - 1 ? $row + 1 : $row;
-            $nextCol = $col == $cols - 1 ? 0 : $col + 1;
-
-            // Shuffle colors to introduce randomness
-            shuffle($colors);
-
-            foreach ($colors as $color) {
-                if (isSafeColor($board, $row, $col, $color) && $colorCounts[$color] < 9) {
-                    $board[$row][$col] = $color;
-                    $colorCounts[$color]++;
-
-                    if (placeDiscs($board, $colorCounts, $colors, $nextRow, $nextCol)) {
-                        return true; // Placement is successful
-                    }
-
-                    $board[$row][$col] = null; // Backtrack
-                    $colorCounts[$color]--;
-                }
-            }
-
-            return false; // No valid placement found
-        }
-
-        function initializeBoard($size, $numColors): array
-        {
-            $board = array_fill(0, $size, array_fill(0, $size, null));
-            $colors = range(1, $numColors); // Represent colors as numbers (1, 2, 3, ..., 9)
-            $colorCounts = array_fill(1, $numColors, 0); // Initialize color counts
-
-            // Attempt to place discs on the board
-            if (!placeDiscs($board, $colorCounts, $colors)) {
-                throw new BgaVisibleSystemException("Failed to place discs in the board");
-            }
-
-            return $board;
-        }
-
-        // Usage
-        $boardSize = 9;
-        $numColors = 9;
-        $board = initializeBoard($boardSize, $numColors);
+        $board = $this->initializeBoard($boardSize, $colorsNumber);
         $this->globals->set("board", $board);
 
-        $colors_ids = array_keys($this->colors_info);
+        $colors_ids = array_keys($this->colorsInfo());
         shuffle($colors_ids);
         $this->globals->set("orderedColors", $colors_ids);
 
@@ -157,7 +90,7 @@ class Nibble extends Table
 
         /************ End of the game initialization *****/
     }
-    
+
     protected function getAllDatas()
     {
         $result = [];
@@ -167,6 +100,7 @@ class Nibble extends Table
         $sql = "SELECT player_id id, player_score score FROM player";
         $result = [
             "version" => (int) $this->gamestate->table_globals[300],
+            "is13Colors" => $this->is13Colors(),
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
             "orderedColors" => $this->globals->get("orderedColors"),
@@ -189,6 +123,101 @@ class Nibble extends Table
     //////////////////////////////////////////////////////////////////////////////
     //////////// Utility functions
     //////////// 
+
+    /* SETUP */
+
+    function isSafeColor($board, $row, $col, $color): bool
+    {
+        // Check the orthogonal neighbors (up, down, left, right)
+        $rows = count($board);
+        $cols = count($board[0]);
+
+        if ($row > 0 && $board[$row - 1][$col] === $color) {
+            return false;
+        } // Up
+
+        if ($row < $rows - 1 && $board[$row + 1][$col] === $color) {
+            return false;
+        } // Down
+
+        if ($col > 0 && $board[$row][$col - 1] === $color) {
+            return false;
+        } // Left
+
+        if ($col < $cols - 1 && $board[$row][$col + 1] === $color) {
+            return false;
+        } // Right
+
+        return true;
+    }
+
+    function placeDiscs(array &$board, array &$colorCounts, array $colors, int $row = 0, int $col = 0): bool
+    {
+        $rows = count($board);
+        $cols = count($board[0]);
+
+        if ($row == $rows) {
+            return true;
+        } // All rows are processed
+
+        // Move to the next row when the end of a column is reached
+        $nextRow = $col == $cols - 1 ? $row + 1 : $row;
+        $nextCol = $col == $cols - 1 ? 0 : $col + 1;
+
+        // Shuffle colors to introduce randomness
+        shuffle($colors);
+
+        foreach ($colors as $color) {
+            if ($this->isSafeColor($board, $row, $col, $color) && $colorCounts[$color] < count($colors)) {
+                $board[$row][$col] = $color;
+                $colorCounts[$color]++;
+
+                if ($this->placeDiscs($board, $colorCounts, $colors, $nextRow, $nextCol)) {
+                    return true; // Placement is successful
+                }
+
+                $board[$row][$col] = null; // Backtrack
+                $colorCounts[$color]--;
+            }
+        }
+
+        return false; // No valid placement found
+    }
+
+    function initializeBoard(int $size, int $colorsNumber): array
+    {
+        $board = array_fill(0, $size, array_fill(0, $size, null));
+        $colors = range(1, $colorsNumber); // Represent colors as numbers (1, 2, 3, ..., 9)
+        $colorCounts = array_fill(1, $colorsNumber, 0); // Initialize color counts
+
+        // Attempt to place discs on the board
+        if (!$this->placeDiscs($board, $colorCounts, $colors)) {
+            throw new BgaVisibleSystemException("Failed to place discs in the board");
+        }
+
+        return $board;
+    }
+
+
+    public function is13Colors(): bool
+    {
+        return (int) $this->getGameStateValue("variant") === 2;
+    }
+
+    public function colorsInfo(): array
+    {
+        return $this->is13Colors() ? $this->colors13_info : $this->colors_info;
+    }
+
+    public function colorsNumber(): int
+    {
+        return count($this->colorsInfo());
+    }
+
+    public function adjacentCondition(): int
+    {
+        return $this->is13Colors() ? 10 : 7;
+    }
 
     public function checkVersion(int $clientVersion): void
     {
@@ -339,9 +368,11 @@ class Nibble extends Table
             throw new BgaVisibleSystemException("Invalid discs input");
         }
 
+        $colorsNumber = $this->colorsNumber();
+
         $possible_keys = ["row", "column", "color_id"];
-        $possible_positions = range(0, 8);
-        $possible_colors = range(1, 9);
+        $possible_positions = range(0, $colorsNumber - 1);
+        $possible_colors = range(1, $colorsNumber);
 
         $board = $this->globals->get("board");
         $components = [];
@@ -420,8 +451,9 @@ class Nibble extends Table
     public function piecesCount(array $board): int
     {
         $piecesCount = 0;
-        for ($x = 0; $x < 9; $x++) {
-            for ($y = 0; $y < 9; $y++) {
+        $colorsNumber = $this->colorsNumber();
+        for ($x = 0; $x < $colorsNumber; $x++) {
+            for ($y = 0; $y < $colorsNumber; $y++) {
                 if ($board[$x][$y] !== null) {
                     $piecesCount++;
                 }
@@ -543,11 +575,11 @@ class Nibble extends Table
         $board = $this->globals->get("board");
         $piecesCount = $this->piecesCount($board);
 
-        $sevenOrMore = [];
+        $adjacentCondition = [];
         $collection = $this->globals->get("collections")[$player_id];
         $orderedColors = $this->globals->get("orderedColors");
 
-        $sevenOrMore = 0;
+        $adjacentCondition = 0;
 
         foreach ($orderedColors as $color_id) {
             $discs = [];
@@ -557,20 +589,21 @@ class Nibble extends Table
             }
 
             $discsCount = count($discs);
+            $colorsNumber = $this->colorsNumber();
 
-            if ($discsCount === 9) {
+            if ($discsCount === $colorsNumber) {
                 $winner_id = $player_id;
-                $win_condition = clienttranslate("9 pieces of one color");
+                $win_condition = clienttranslate("All pieces of one color");
                 break;
             }
 
-            if ($discsCount >= 7) {
-                $sevenOrMore++;
+            if ($discsCount >= $this->adjacentCondition()) {
+                $adjacentCondition++;
             } else {
-                $sevenOrMore = 0;
+                $adjacentCondition = 0;
             }
 
-            if ($sevenOrMore === 3) {
+            if ($adjacentCondition === 3) {
                 $winner_id = $player_id;
                 $win_condition = clienttranslate("7 or more pieces of three adjacent colors");
                 break;
@@ -655,7 +688,7 @@ class Nibble extends Table
                     "row" => $disc_row + 1,
                     "column" => $disc_column + 1,
                     "disc" => $disc,
-                    "color_label" => $this->colors_info[$activeColor]["tr_name"],
+                    "color_label" => $this->colorsInfo()[$activeColor]["tr_name"],
                     "i18n" => ["color_label"],
                     "preserve" => ["color_id"],
                     "color_id" => $activeColor,
@@ -669,7 +702,6 @@ class Nibble extends Table
         $this->globals->set("board", $board);
         $this->gamestate->nextState("betweenPlayers");
     }
-
 
     //////////////////////////////////////////////////////////////////////////////
     //////////// Game state actions and arguments

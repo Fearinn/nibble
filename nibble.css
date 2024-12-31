@@ -27,13 +27,13 @@ html {
 }
 
 .nib_colorblind .nib_colorblindHelp {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translateX(-50%) translateY(-50%);
   display: block;
-  position: relative;
-  left: 37%;
-  top: 33%;
   text-align: center;
   padding: 1px;
-  width: 27%;
 }
 
 .nib_square .nib_disc,
@@ -98,14 +98,14 @@ html {
 .nib_xAxis {
   display: grid;
   grid-area: x;
-  grid-template-columns: repeat(9, var(--pieceSize));
+  grid-template-columns: repeat(auto-fit, var(--pieceSize));
   gap: 4px;
 }
 
 .nib_yAxis {
   display: grid;
   grid-area: y;
-  grid-template-rows: repeat(9, var(--pieceSize));
+  grid-template-rows: repeat(auto-fit, var(--pieceSize));
   gap: 4px;
   vertical-align: middle;
 }
@@ -128,16 +128,13 @@ html {
   display: flex;
   flex-direction: column;
   gap: 8px;
-  flex-grow: 1;
   padding: 4px;
-  max-width: calc((var(--pieceSizeSM) + 6px) * 9);
 }
 
 .nib_collectionContainer {
   display: flex;
   flex-direction: column;
   gap: 2px;
-  max-height: calc((var(--pieceSizeSM) + 6px) * 9);
   width: 100%;
 }
 
@@ -182,7 +179,6 @@ html {
 
 .nib_separator .nib_colorblindHelp {
   font-size: 12px;
-  top: 0;
 }
 
 .nib_disc {
@@ -224,8 +220,6 @@ html {
 }
 
 .nib_counter .nib_colorblindHelp {
-  left: 34%;
-  top: 25%;
   font-size: 12px;
 }
 

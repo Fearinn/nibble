@@ -25,6 +25,10 @@
         <div id="nib_xAxis-7" class="nib_axisNumber">7</div>
         <div id="nib_xAxis-8" class="nib_axisNumber">8</div>
         <div id="nib_xAxis-9" class="nib_axisNumber">9</div>
+        <div id="nib_xAxis-10" class="nib_axisNumber" data-variant="13">10</div>
+        <div id="nib_xAxis-11" class="nib_axisNumber" data-variant="13">11</div>
+        <div id="nib_xAxis-12" class="nib_axisNumber" data-variant="13">12</div>
+        <div id="nib_xAxis-13" class="nib_axisNumber" data-variant="13">13</div>
       </div>
       <div id="nib_yAxis" class="nib_yAxis">
         <div id="nib_yAxis-1" class="nib_axisNumber">1</div>
@@ -36,6 +40,10 @@
         <div id="nib_yAxis-7" class="nib_axisNumber">7</div>
         <div id="nib_yAxis-8" class="nib_axisNumber">8</div>
         <div id="nib_yAxis-9" class="nib_axisNumber">9</div>
+        <div id="nib_yAxis-10" class="nib_axisNumber" data-variant="13">10</div>
+        <div id="nib_yAxis-11" class="nib_axisNumber" data-variant="13">11</div>
+        <div id="nib_yAxis-12" class="nib_axisNumber" data-variant="13">12</div>
+        <div id="nib_yAxis-13" class="nib_axisNumber" data-variant="13">13</div>
       </div>
       <div id="nib_board" class="nib_board"></div>
     </div>

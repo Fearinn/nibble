@@ -30,13 +30,20 @@ define([
     setup: function (gamedatas) {
       console.log("Starting game setup");
 
-      this.nib = {};
-      this.nib.info = {};
-      this.nib.globals = {};
-      this.nib.stocks = {};
-      this.nib.selections = {};
-      this.nib.managers = {
-        counters: {},
+      this.nib = {
+        info: {},
+        globals: {},
+        stocks: {},
+        selections: {
+          color: null,
+        },
+        counts: gamedatas.counts,
+        managers: {
+          counters: {},
+        },
+        variants: {
+          is13Colors: gamedatas.is13Colors,
+        },
       };
 
       this.nib.info.colors = {
@@ -51,6 +58,16 @@ define([
         9: "black",
       };
 
+      if (this.nib.variants.is13Colors) {
+        this.nib.info.colors = {
+          ...this.nib.info.colors,
+          10: "deeppink",
+          11: "deepskyblue",
+          12: "lightgreen",
+          13: "sienna",
+        };
+      }
+
       this.nib.info.darkColors = {
         1: "green",
         2: "purple",
@@ -58,6 +75,7 @@ define([
         6: "blue",
         8: "gray",
         9: "black",
+        13: "sienna",
       };
 
       this.nib.info.colorblindHelp = {
@@ -70,6 +88,10 @@ define([
         7: "G",
         8: "H",
         9: "I",
+        10: "J",
+        11: "K",
+        12: "L",
+        13: "M",
       };
 
       this.nib.version = gamedatas.version;
@@ -81,17 +103,15 @@ define([
       this.nib.globals.collections = gamedatas.collections;
       this.nib.globals.playersNoInstaWin = gamedatas.playersNoInstaWin;
 
-      this.nib.counts = gamedatas.counts;
-      this.nib.selections.color = null;
-
       this.nib.managers.discs = new CardManager(this, {
         cardHeight: 60,
         cardWidth: 60,
         selectedCardClass: "nib_selectedDisc",
-        getId: (card) => `disc-${card.row}${card.column}`,
+        getId: (card) => `disc-row_${card.row}-col_${card.column}`,
         setupDiv: (card, div) => {
           const color_id = card.color_id;
           const color = this.nib.info.colors[color_id];
+
           div.classList.add("nib_disc");
           div.style.backgroundColor = color;
           div.style.gridRow = card.row + 1;
@@ -294,7 +314,7 @@ define([
             direction: "row",
             gap: "2px",
             wrap: "nowrap",
-            slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9],
+            slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
             mapCardToSlot: (disc) => {
               return Number(disc.color_id);
             },
@@ -452,7 +472,7 @@ define([
             const color_id = args.color_id;
             const color = this.nib.info.colors[color_id];
             const backgroundColor =
-              color === "white" || color === "yellow" ? "black" : "white";
+              !!this.nib.info.darkColors[color_id] ? "white" : "black";
 
             args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`;
           }

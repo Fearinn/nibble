@@ -22,39 +22,94 @@
 
 $this->colors_info = [
     1 => [
-        'name' => 'green',
-        'tr_name' => clienttranslate('green')
+        "name" => "green",
+        "tr_name" => clienttranslate("green")
     ],
     2 => [
-        'name' => 'purple',
-        'tr_name' => clienttranslate('purple')
+        "name" => "purple",
+        "tr_name" => clienttranslate("purple")
     ],
     3 => [
-        'name' => 'red',
-        'tr_name' => clienttranslate('red')
+        "name" => "red",
+        "tr_name" => clienttranslate("red")
     ],
     4 => [
-        'name' => 'yellow',
-        'tr_name' => clienttranslate('yellow')
+        "name" => "yellow",
+        "tr_name" => clienttranslate("yellow")
     ],
     5 => [
-        'name' => 'orange',
-        'tr_name' => clienttranslate('orange')
+        "name" => "orange",
+        "tr_name" => clienttranslate("orange")
     ],
     6 => [
-        'name' => 'blue',
-        'tr_name' => clienttranslate('blue')
+        "name" => "blue",
+        "tr_name" => clienttranslate("blue")
     ],
     7 => [
-        'name' => 'white',
-        'tr_name' => clienttranslate('white')
+        "name" => "white",
+        "tr_name" => clienttranslate("white")
     ],
     8 => [
-        'name' => 'gray',
-        'tr_name' => clienttranslate('gray')
+        "name" => "gray",
+        "tr_name" => clienttranslate("gray")
     ],
     9 => [
-        'name' => 'black',
-        'tr_name' => clienttranslate('black')
+        "name" => "black",
+        "tr_name" => clienttranslate("black")
     ],
+];
+
+$this->colors13_info = [
+    1 => [
+        "name" => "green",
+        "tr_name" => clienttranslate("green")
+    ],
+    2 => [
+        "name" => "purple",
+        "tr_name" => clienttranslate("purple")
+    ],
+    3 => [
+        "name" => "red",
+        "tr_name" => clienttranslate("red")
+    ],
+    4 => [
+        "name" => "yellow",
+        "tr_name" => clienttranslate("yellow")
+    ],
+    5 => [
+        "name" => "orange",
+        "tr_name" => clienttranslate("orange")
+    ],
+    6 => [
+        "name" => "blue",
+        "tr_name" => clienttranslate("blue")
+    ],
+    7 => [
+        "name" => "white",
+        "tr_name" => clienttranslate("white")
+    ],
+    8 => [
+        "name" => "gray",
+        "tr_name" => clienttranslate("gray")
+    ],
+    9 => [
+        "name" => "black",
+        "tr_name" => clienttranslate("black")
+    ],
+    10 => [
+        "name" => "pink",
+        "tr_name" => clienttranslate("pink"),
+    ],
+    11 => [
+        "name" => "lightblue",
+        "tr_name" => clienttranslate("lightblue"),
+    ],
+    12 => [
+        "name" => "lightgreen",
+        "tr_name" => clienttranslate("light green"),
+    ],
+    13 => [
+        "name" => "sienna",
+        "tr_name" => clienttranslate("sienna"),
+    ]
 ];

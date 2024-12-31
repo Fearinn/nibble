@@ -49,6 +49,26 @@
       "id": 18,
       "name": "Black pieces collected",
       "type": "int"
+    },
+    "10:collected": {
+      "id": 20,
+      "name": "Pink pieces collected",
+      "type": "int"
+    },
+    "11:collected": {
+      "id": 21,
+      "name": "Light blue pieces collected",
+      "type": "int"
+    },
+    "12:collected": {
+      "id": 22,
+      "name": "Light green pieces collected",
+      "type": "int"
+    },
+    "13:collected": {
+      "id": 23,
+      "name": "Sienna pieces collected",
+      "type": "int"
     }
   }
 }
