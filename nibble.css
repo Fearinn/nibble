@@ -54,6 +54,10 @@ html {
   filter: contrast(0.6) brightness(0.75) !important;
 }
 
+html:not(.nib_13colors) [data-variant="13"] {
+  display: none;
+}
+
 .nib_gameArea {
   display: flex;
   flex-direction: column;

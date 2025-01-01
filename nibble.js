@@ -61,7 +61,7 @@ define([
       if (this.nib.variants.is13Colors) {
         this.nib.info.colors = {
           ...this.nib.info.colors,
-          10: "deeppink",
+          10: "lightpink",
           11: "deepskyblue",
           12: "lightgreen",
           13: "sienna",
@@ -134,6 +134,10 @@ define([
       });
 
       this.updateWinConWarn(this.nib.globals.playersNoInstaWin);
+
+      if (this.nib.variants.is13Colors) {
+        document.querySelector("html").classList.add("nib_13colors");
+      }
 
       /* BOARD */
       const boardElement = document.getElementById("nib_board");
@@ -314,7 +318,7 @@ define([
             direction: "row",
             gap: "2px",
             wrap: "nowrap",
-            slotsIds: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+            slotsIds: Object.keys(this.nib.info.colors),
             mapCardToSlot: (disc) => {
               return Number(disc.color_id);
             },
@@ -471,8 +475,9 @@ define([
           if (args.color_label && args.color_id) {
             const color_id = args.color_id;
             const color = this.nib.info.colors[color_id];
-            const backgroundColor =
-              !!this.nib.info.darkColors[color_id] ? "white" : "black";
+            const backgroundColor = !!this.nib.info.darkColors[color_id]
+              ? "white"
+              : "black";
 
             args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`;
           }
