@@ -198,10 +198,10 @@ class Nibble extends Table
         return $board;
     }
 
-
     public function is13Colors(): bool
     {
-        return (int) $this->getGameStateValue("variant") === 2;
+        $variant = (int) $this->getGameStateValue("variant");
+        return $variant === 2 || $variant === 3;
     }
 
     public function colorsInfo(): array

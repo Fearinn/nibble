@@ -3,27 +3,17 @@
     "name": "Number of colors",
     "values": {
       "1": {
-        "name": "9 colors"
+        "name": "9-color"
       },
       "2": {
-        "name": "13 colors",
+        "name": "13-color",
+        "alpha": true
+      },
+      "3": {
+        "name": "13-color hex",
         "alpha": true
       }
     },
     "default": 1
-  },
-  "101": {
-    "name": "Board format",
-    "displaycondition": [{ "type": "otheroption", "id": 100, "value": 2 }],
-    "values": {
-      "1": {
-        "name": "Square",
-        "alpha": true
-      },
-      "2": {
-        "name": "Hexagon",
-        "alpha": true
-      }
-    }
   }
 }
