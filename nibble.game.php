@@ -101,6 +101,7 @@ class Nibble extends Table
         $result = [
             "version" => (int) $this->gamestate->table_globals[300],
             "is13Colors" => $this->is13Colors(),
+            "colors_info" => $this->colorsInfo(),
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
             "orderedColors" => $this->globals->get("orderedColors"),

@@ -46,37 +46,8 @@ define([
         },
       };
 
-      this.nib.info.colors = {
-        1: "green",
-        2: "purple",
-        3: "red",
-        4: "yellow",
-        5: "orange",
-        6: "blue",
-        7: "white",
-        8: "gray",
-        9: "black",
-      };
-
-      if (this.nib.variants.is13Colors) {
-        this.nib.info.colors = {
-          ...this.nib.info.colors,
-          10: "lightpink",
-          11: "deepskyblue",
-          12: "lightgreen",
-          13: "sienna",
-        };
-      }
-
-      this.nib.info.darkColors = {
-        1: "green",
-        2: "purple",
-        3: "red",
-        6: "blue",
-        8: "gray",
-        9: "black",
-        13: "sienna",
-      };
+      this.nib.info.colors = gamedatas.colors_info;
+      this.nib.info.darkColors = [1, 2, 3, 6, 8, 9, 13];
 
       this.nib.info.colorblindHelp = {
         1: "A",
@@ -113,17 +84,20 @@ define([
           const color = this.nib.info.colors[color_id];
 
           div.classList.add("nib_disc");
-          div.style.backgroundColor = color;
           div.style.gridRow = card.row + 1;
           div.style.gridColumn = card.column + 1;
           div.style.position = "relative";
 
-          this.addTooltip(div.id, _(color), "");
+          div.style.backgroundColor = color.name;
+          console.log(color.name)
+          this.addTooltip(div.id, _(color.tr_name), "");
 
           const colorblindHelp = document.createElement("span");
           colorblindHelp.textContent = this.nib.info.colorblindHelp[color_id];
           colorblindHelp.classList.add("nib_colorblindHelp");
-          colorblindHelp.style.color = this.nib.info.darkColors[color_id]
+          colorblindHelp.style.color = this.nib.info.darkColors.includes(
+            color_id
+          )
             ? "white"
             : "black";
 
@@ -235,12 +209,14 @@ define([
 
           const color = this.nib.info.colors[color_id];
           const colorblindHelp = this.nib.info.colorblindHelp[color_id];
-          const colorblindHelpColor = this.nib.info.darkColors[color_id]
+          const colorblindHelpColor = this.nib.info.darkColors.includes(
+            color_id
+          )
             ? "white"
             : "black";
 
           countersElement.innerHTML += `<div id="nib_counter:${player_id}-${color_id}" class="nib_counter">
-            <div class="nib_disc-counter nib_disc" style="background-color: ${color}">
+            <div class="nib_disc-counter nib_disc" style="background-color: ${color.name}">
               <span class="nib_colorblindHelp" style="color: ${colorblindHelpColor}">${colorblindHelp}</span>
             </div>
             <span id="nib_count:${player_id}-${color_id}" class="nib_count">0</span>
@@ -283,11 +259,13 @@ define([
           orderedColors.forEach((color_id) => {
             const color = this.nib.info.colors[color_id];
             const colorblindHelp = this.nib.info.colorblindHelp[color_id];
-            const colorblindHelpColor = this.nib.info.darkColors[color_id]
+            const colorblindHelpColor = this.nib.info.darkColors.includes(
+              color_id
+            )
               ? "white"
               : "black";
 
-            separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color}">
+            separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color.name}">
               <span class="nib_colorblindHelp" style="color: ${colorblindHelpColor}">${colorblindHelp}</span>
             </div>`;
           });
@@ -296,7 +274,7 @@ define([
             const color = this.nib.info.colors[color_id];
             this.addTooltip(
               `nib_separator:${player_id}-${color_id}`,
-              color,
+              _(color.tr_name),
               ""
             );
           });
@@ -475,11 +453,11 @@ define([
           if (args.color_label && args.color_id) {
             const color_id = args.color_id;
             const color = this.nib.info.colors[color_id];
-            const backgroundColor = !!this.nib.info.darkColors[color_id]
+            const backgroundColor = this.nib.info.darkColors.includes(color_id)
               ? "white"
               : "black";
 
-            args.color_label = `<span class="nib_color-log" style="color: ${color}; background-color: ${backgroundColor}">${args.color_label}</span>`;
+            args.color_label = `<span class="nib_color-log" style="color: ${color.name}; background-color: ${backgroundColor}">${args.color_label}</span>`;
           }
 
           if (args.win_condition) {
