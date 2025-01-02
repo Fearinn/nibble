@@ -117,7 +117,7 @@ class Nibble extends Table
     public function getGameProgression(): int
     {
         $board = $this->globals->get("board");
-        $progression = 1 - $this->piecesCount($board) / 81;
+        $progression = 1 - $this->piecesCount($board) / $this->totalPieces();
         return round($progression * 100);
     }
 
@@ -203,6 +203,11 @@ class Nibble extends Table
     {
         $variant = (int) $this->getGameStateValue("variant");
         return $variant === 2 || $variant === 3;
+    }
+
+    public function totalPieces(): int
+    {
+        return $this->colorsNumber() ** 2;
     }
 
     public function colorsInfo(): array
@@ -524,7 +529,7 @@ class Nibble extends Table
             if ($opponentDiscsCount === 0) {
                 return true;
             }
-            
+
 
             if ($opponentDiscsCount <= $this->colorsNumber() - $this->adjacentPieces()) {
                 $possibleAdjacent++;
