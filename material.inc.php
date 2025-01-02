@@ -106,7 +106,7 @@ $this->colors13_info = [
     ],
     12 => [
         "name" => "lightgreen",
-        "tr_name" => clienttranslate("light green"),
+        "tr_name" => clienttranslate("mint"),
     ],
     13 => [
         "name" => "sienna",

@@ -62,7 +62,7 @@
     },
     "12:collected": {
       "id": 22,
-      "name": "Light green pieces collected",
+      "name": "Mint pieces collected",
       "type": "int"
     },
     "13:collected": {
