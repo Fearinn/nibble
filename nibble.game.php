@@ -524,8 +524,9 @@ class Nibble extends Table
             if ($opponentDiscsCount === 0) {
                 return true;
             }
+            
 
-            if ($opponentDiscsCount < $this->adjacentPieces()) {
+            if ($opponentDiscsCount <= $this->colorsNumber() - $this->adjacentPieces()) {
                 $possibleAdjacent++;
 
                 if ($possibleAdjacent >= $this->adjacentColors()) {
