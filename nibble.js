@@ -89,7 +89,6 @@ define([
           div.style.position = "relative";
 
           div.style.backgroundColor = color.name;
-          console.log(color.name)
           this.addTooltip(div.id, _(color.tr_name), "");
 
           const colorblindHelp = document.createElement("span");
