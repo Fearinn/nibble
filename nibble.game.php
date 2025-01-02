@@ -207,7 +207,11 @@ class Nibble extends Table
 
     public function colorsInfo(): array
     {
-        return $this->is13Colors() ? $this->colors13_info : $this->colors_info;
+        if ($this->is13Colors()) {
+            return $this->colors13_info;
+        }
+
+        return $this->colors_info;
     }
 
     public function colorsNumber(): int
@@ -215,9 +219,18 @@ class Nibble extends Table
         return count($this->colorsInfo());
     }
 
-    public function adjacentCondition(): int
+    public function adjacentPieces(): int
     {
-        return $this->is13Colors() ? 10 : 7;
+        if ($this->is13Colors()) {
+            return 10;
+        }
+
+        return 7;
+    }
+
+    public function adjacentColors(): int
+    {
+        return 3;
     }
 
     public function checkVersion(int $clientVersion): void
@@ -580,7 +593,7 @@ class Nibble extends Table
         $collection = $this->globals->get("collections")[$player_id];
         $orderedColors = $this->globals->get("orderedColors");
 
-        $adjacentCondition = 0;
+        $adjacentColors = 0;
 
         foreach ($orderedColors as $color_id) {
             $discs = [];
@@ -594,19 +607,19 @@ class Nibble extends Table
 
             if ($discsCount === $colorsNumber) {
                 $winner_id = $player_id;
-                $win_condition = clienttranslate("All pieces of one color");
+                $win_condition = clienttranslate("all pieces of one color");
                 break;
             }
 
-            if ($discsCount >= $this->adjacentCondition()) {
-                $adjacentCondition++;
+            if ($discsCount >= $this->adjacentPieces()) {
+                $adjacentColors++;
             } else {
-                $adjacentCondition = 0;
+                $adjacentColors = 0;
             }
 
-            if ($adjacentCondition === 3) {
+            if ($adjacentCondition === $this->adjacentColors()) {
                 $winner_id = $player_id;
-                $win_condition = clienttranslate("7 or more pieces of three adjacent colors");
+                $win_condition = clienttranslate('${pieces_nbr} of ${colors_nbr} adjacent colors');
                 break;
             }
         }
@@ -630,7 +643,13 @@ class Nibble extends Table
                 [
                     "player_id" => $winner_id,
                     "player_name" => $this->getPlayerNameById($winner_id),
-                    "win_condition" => $win_condition,
+                    "win_condition" => [
+                        "log" => $win_condition,
+                        "args" => [
+                            "pieces_nbr" => $this->adjacentPieces(),
+                            "colors_nbr" => $this->adjacentColors(),
+                        ],
+                    ],
                     "i18n" => ["win_condition"],
                 ]
             );
