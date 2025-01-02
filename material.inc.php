@@ -102,7 +102,7 @@ $this->colors13_info = [
     ],
     11 => [
         "name" => "deepskyblue",
-        "tr_name" => clienttranslate("light blue"),
+        "tr_name" => clienttranslate("cyan"),
     ],
     12 => [
         "name" => "lightgreen",

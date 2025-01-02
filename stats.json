@@ -57,7 +57,7 @@
     },
     "11:collected": {
       "id": 21,
-      "name": "Light blue pieces collected",
+      "name": "Cyan pieces collected",
       "type": "int"
     },
     "12:collected": {
