@@ -20,6 +20,7 @@ define([
   "dojo/_base/declare",
   "ebg/core/gamegui",
   "ebg/counter",
+  `${g_gamethemeurl}modules/bga-zoom.js`,
   `${g_gamethemeurl}modules/bga-cards.js`,
 ], function (dojo, declare) {
   return declare("bgagame.nibble", ebg.core.gamegui, {
@@ -73,6 +74,39 @@ define([
       this.nib.globals.legalMoves = gamedatas.legalMoves;
       this.nib.globals.collections = gamedatas.collections;
       this.nib.globals.playersNoInstaWin = gamedatas.playersNoInstaWin;
+
+      this.nib.managers.zoom = new ZoomManager({
+        element: document.getElementById("nib_gameArea"),
+        localStorageZoomKey: "nibble-zoom",
+        zoomControls: {
+          color: "black",
+        },
+        zoomLevels: [0.375, 0.5, 0.75, 1, 1.25, 1.5],
+        smooth: true,
+        onZoomChange: (zoom) => {
+          const winConWarnElement = document.getElementById("nib_winConWarn");
+
+          if (zoom >= 1) {
+            winConWarnElement.style.removeProperty("transform");
+            winConWarnElement.style.removeProperty("margin");
+            return;
+          }
+
+          winConWarnElement.style.transform = `scale(${1 / zoom})`;
+
+          let margin = 8;
+
+          if (zoom <= 0.5) {
+            margin = 24;
+          }
+
+          if (zoom <= 0.375) {
+            margin = 44;
+          }
+
+          winConWarnElement.style.margin = `${margin}px 0`;
+        },
+      });
 
       this.nib.managers.discs = new CardManager(this, {
         cardHeight: 60,
@@ -251,9 +285,7 @@ define([
           collectionsElement.innerHTML += `<div id="nib_separators" class="nib_separators"></div>`;
 
           const orderedColors = this.nib.info.orderedColors;
-          const separatorsElement = document.getElementById(
-            `nib_separators`
-          );
+          const separatorsElement = document.getElementById(`nib_separators`);
 
           orderedColors.forEach((color_id) => {
             const color = this.nib.info.colors[color_id];
@@ -274,11 +306,7 @@ define([
       const orderedColors = this.nib.info.orderedColors;
       orderedColors.forEach((color_id) => {
         const color = this.nib.info.colors[color_id];
-        this.addTooltip(
-          `nib_separator-${color_id}`,
-          _(color.tr_name),
-          ""
-        );
+        this.addTooltip(`nib_separator-${color_id}`, _(color.tr_name), "");
       });
 
       for (const player_id in this.nib.info.players) {
