@@ -1,16 +1,12 @@
 {
   "100": {
-    "name": "Number of colors",
+    "name": "Variant",
     "values": {
       "1": {
-        "name": "9-color"
+        "name": "Original"
       },
       "2": {
-        "name": "13-color",
-        "alpha": true
-      },
-      "3": {
-        "name": "13-color hex",
+        "name": "13 colors",
         "alpha": true
       }
     },
