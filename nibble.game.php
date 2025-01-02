@@ -487,6 +487,7 @@ class Nibble extends Table
         $winner_id = null;
         $majorities = [];
         $collections = $this->globals->get("collections");
+        $majority = ceil($this->colorsNumber() / 2);
 
         $majorities = [];
         foreach ($collections as $player_id => $colors) {
@@ -495,14 +496,14 @@ class Nibble extends Table
             foreach ($colors as $color_id => $discs) {
                 $discsCount = count($discs);
 
-                if ($discsCount >= 5) {
+                if ($discsCount >= $majority) {
                     $majorities[$player_id]++;
                 }
             }
         }
 
         foreach ($majorities as $player_id => $majoritiesCount) {
-            if ($majoritiesCount >= 5) {
+            if ($majoritiesCount >= $majority) {
                 $winner_id = $player_id;
             }
         }
