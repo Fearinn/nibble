@@ -248,11 +248,11 @@ define([
         `;
 
         if (collectionsElement.childElementCount === 1) {
-          collectionsElement.innerHTML += `<div id="nib_separators:${player_id}" class="nib_separators"></div>`;
+          collectionsElement.innerHTML += `<div id="nib_separators" class="nib_separators"></div>`;
 
           const orderedColors = this.nib.info.orderedColors;
           const separatorsElement = document.getElementById(
-            `nib_separators:${player_id}`
+            `nib_separators`
           );
 
           orderedColors.forEach((color_id) => {
@@ -264,21 +264,22 @@ define([
               ? "white"
               : "black";
 
-            separatorsElement.innerHTML += `<div id="nib_separator:${player_id}-${color_id}" class="nib_separator" style="background-color: ${color.name}">
+            separatorsElement.innerHTML += `<div id="nib_separator-${color_id}" class="nib_separator" style="background-color: ${color.name}">
               <span class="nib_colorblindHelp" style="color: ${colorblindHelpColor}">${colorblindHelp}</span>
             </div>`;
           });
-
-          orderedColors.forEach((color_id) => {
-            const color = this.nib.info.colors[color_id];
-            this.addTooltip(
-              `nib_separator:${player_id}-${color_id}`,
-              _(color.tr_name),
-              ""
-            );
-          });
         }
       }
+
+      const orderedColors = this.nib.info.orderedColors;
+      orderedColors.forEach((color_id) => {
+        const color = this.nib.info.colors[color_id];
+        this.addTooltip(
+          `nib_separator-${color_id}`,
+          _(color.tr_name),
+          ""
+        );
+      });
 
       for (const player_id in this.nib.info.players) {
         this.nib.stocks[player_id] = {};
