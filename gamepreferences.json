@@ -11,7 +11,7 @@
         "cssPref": "nib_colorblind"
       }
     },
-    "default": 1
+    "default": 0
   },
   "101": {
     "name": "Piece format",
