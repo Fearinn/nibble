@@ -485,11 +485,11 @@ define([
               ? "white"
               : "black";
 
-            args.color_label = `<span class="nib_color-log" style="color: ${color.name}; background-color: ${backgroundColor}">${args.color_label}</span>`;
+            args.color_label = `<span class="nib_color-log" style="color: ${color.name}; background-color: ${backgroundColor}">${_(args.color_label)}</span>`;
           }
 
           if (args.win_condition) {
-            args.win_condition = `<span class="nib_highlight-log">${args.win_condition}</span>`;
+            args.win_condition = `<span class="nib_highlight-log">${_(args.win_condition)}</span>`;
           }
         }
       } catch (e) {
