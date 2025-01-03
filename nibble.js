@@ -149,6 +149,10 @@ define([
       /* BOARD */
       const boardElement = document.getElementById("nib_board");
 
+      if (this.nib.variants.is13Colors){
+        boardElement.style.setProperty("--boardSize", 13);
+      }
+
       this.nib.stocks.board = new CardStock(
         this.nib.managers.discs,
         boardElement,
