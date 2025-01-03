@@ -9,10 +9,6 @@
         "name": "13 colors",
         "description": "13 colors with 13 pieces each. Instant win conditions are 13 pieces of one color or 10 pieces of three adjacent colors",
         "alpha": true
-      },
-      "3": {
-        "name": "13-color hex",
-        "alpha": true
       }
     },
     "default": 1
