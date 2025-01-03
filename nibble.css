@@ -106,14 +106,14 @@ html:not(.nib_13colors) [data-variant="13"] {
 .nib_xAxis {
   display: grid;
   grid-area: x;
-  grid-template-columns: repeat(auto-fit, var(--pieceSize));
+  grid-template-columns: repeat(var(--boardSize), var(--pieceSize));
   gap: 4px;
 }
 
 .nib_yAxis {
   display: grid;
   grid-area: y;
-  grid-template-rows: repeat(auto-fit, var(--pieceSize));
+  grid-template-rows: repeat(var(--boardSize), var(--pieceSize));
   gap: 4px;
   vertical-align: middle;
 }
@@ -127,8 +127,8 @@ html:not(.nib_13colors) [data-variant="13"] {
 .nib_board {
   grid-area: a;
   display: grid;
-  grid-template-rows: repeat(auto-fit, var(--pieceSize));
-  grid-template-columns: repeat(auto-fit, var(--pieceSize));
+  grid-template-rows: repeat(var(--boardSize), var(--pieceSize));
+  grid-template-columns: repeat(var(--boardSize), var(--pieceSize));
   gap: 4px;
   height: calc((var(--pieceSize) + 4px) * var(--boardSize));
   width: calc((var(--pieceSize) + 4px) * var(--boardSize));

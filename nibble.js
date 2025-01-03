@@ -154,13 +154,16 @@ define([
 
       this.updateWinConWarn(this.nib.globals.playersNoInstaWin);
 
+      const html = document.querySelector("html");
+
       if (this.nib.variants.is13Colors) {
-        document.querySelector("html").classList.add("nib_13colors");
+        html.classList.add("nib_13colors");
       }
+
+      html.style.setProperty("--boardSize", this.nib.info.boardSize);
 
       /* BOARD */
       const boardElement = document.getElementById("nib_board");
-      boardElement.style.setProperty("--boardSize", this.nib.info.boardSize);
 
       this.nib.stocks.board = new CardStock(
         this.nib.managers.discs,
