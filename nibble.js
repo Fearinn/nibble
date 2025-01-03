@@ -149,6 +149,10 @@ define([
       /* BOARD */
       const boardElement = document.getElementById("nib_board");
 
+      if (this.nib.variants.is13Colors){
+        boardElement.style.setProperty("--boardSize", 13);
+      }
+
       this.nib.stocks.board = new CardStock(
         this.nib.managers.discs,
         boardElement,
@@ -485,11 +489,11 @@ define([
               ? "white"
               : "black";
 
-            args.color_label = `<span class="nib_color-log" style="color: ${color.name}; background-color: ${backgroundColor}">${args.color_label}</span>`;
+            args.color_label = `<span class="nib_color-log" style="color: ${color.name}; background-color: ${backgroundColor}">${_(args.color_label)}</span>`;
           }
 
           if (args.win_condition) {
-            args.win_condition = `<span class="nib_highlight-log">${args.win_condition}</span>`;
+            args.win_condition = `<span class="nib_highlight-log">${_(args.win_condition)}</span>`;
           }
         }
       } catch (e) {
