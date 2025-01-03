@@ -44,9 +44,11 @@ define([
         },
         variants: {
           is13Colors: gamedatas.is13Colors,
+          isHexagon: gamedatas.isHexagon,
         },
       };
 
+      this.nib.info.boardSize = gamedatas.boardSize;
       this.nib.info.colors = gamedatas.colors_info;
       this.nib.info.darkColors = [1, 2, 3, 6, 8, 9, 13];
 
@@ -123,7 +125,11 @@ define([
           div.style.position = "relative";
 
           div.style.backgroundColor = color.name;
-          this.addTooltip(div.id, _(color.tr_name), "");
+          this.addTooltip(
+            div.id,
+            `${_(color.tr_name)} - (${card.column}, ${card.row})`,
+            ""
+          );
 
           const colorblindHelp = document.createElement("span");
           colorblindHelp.textContent = this.nib.info.colorblindHelp[color_id];
@@ -135,6 +141,12 @@ define([
             : "black";
 
           div.appendChild(colorblindHelp);
+
+          if (this.nib.variants.isHexagon) {
+            if (card.row % 2 === 0) {
+              div.style.left = "50%";
+            }
+          }
         },
         setupFrontDiv: (card, div) => {},
         setupBackDiv: (card, div) => {},
@@ -148,10 +160,7 @@ define([
 
       /* BOARD */
       const boardElement = document.getElementById("nib_board");
-
-      if (this.nib.variants.is13Colors){
-        boardElement.style.setProperty("--boardSize", 13);
-      }
+      boardElement.style.setProperty("--boardSize", this.nib.info.boardSize);
 
       this.nib.stocks.board = new CardStock(
         this.nib.managers.discs,
@@ -489,11 +498,17 @@ define([
               ? "white"
               : "black";
 
-            args.color_label = `<span class="nib_color-log" style="color: ${color.name}; background-color: ${backgroundColor}">${_(args.color_label)}</span>`;
+            args.color_label = `<span class="nib_color-log" style="color: ${
+              color.name
+            }; background-color: ${backgroundColor}">${_(
+              args.color_label
+            )}</span>`;
           }
 
           if (args.win_condition) {
-            args.win_condition = `<span class="nib_highlight-log">${_(args.win_condition)}</span>`;
+            args.win_condition = `<span class="nib_highlight-log">${_(
+              args.win_condition
+            )}</span>`;
           }
         }
       } catch (e) {

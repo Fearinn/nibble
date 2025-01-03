@@ -69,7 +69,7 @@ class Nibble extends Table
         }
 
         $colorsNumber = $this->colorsNumber();
-        $boardSize = $colorsNumber;
+        $boardSize = $this->boardSize();
 
         $board = $this->initializeBoard($boardSize, $colorsNumber);
         $this->globals->set("board", $board);
@@ -101,6 +101,8 @@ class Nibble extends Table
         $result = [
             "version" => (int) $this->gamestate->table_globals[300],
             "is13Colors" => $this->is13Colors(),
+            "isHexagon" => $this->isHexagon(),
+            "boardSize" => $this->boardSize(),
             "colors_info" => $this->colorsInfo(),
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
@@ -206,8 +208,12 @@ class Nibble extends Table
     private function hex_isSafeColor(array $board, int $row, int $col, int $color): bool
     {
         $directions = [
-            [-1, 0], [1, 0], [0, -1], [0, 1], // Orthogonal neighbors
-            [-1, -1], [1, 1] // Diagonal neighbors for hexagons
+            [0, -1],
+            [0, 1], // Orthogonal neighbors
+            [-1, -1],
+            [-1, 0],
+            [1, -1],
+            [1, 0] // Diagonal neighbors for hexagons
         ];
 
         foreach ($directions as [$dRow, $dCol]) {
@@ -259,8 +265,9 @@ class Nibble extends Table
 
     public function hex_initializeBoard(): array
     {
-        $size = 15;
-        $colorsNumber = 9;
+        $size = $this->boardSize();
+        $colorsNumber = $this->colorsNumber();
+
         $board = array_fill(0, $size, array_fill(0, $size, null));
         $colors = range(1, $colorsNumber);
         $colorCounts = array_fill(1, $colorsNumber, 0);
@@ -274,17 +281,26 @@ class Nibble extends Table
         return $board;
     }
 
-    public function generateHexagonMask(int $size): array
+    private function generateHexagonMask(int $size): array
     {
         $mask = array_fill(0, $size, array_fill(0, $size, false));
-        $mid = floor($size / 2);
+        $mid = floor($size / 2); // Center row index
 
         for ($row = 0; $row < $size; $row++) {
-            for ($col = 0; $col < $size; $col++) {
-                $dist = abs($row - $mid) + abs($col - $mid);
-                if ($dist <= $mid) {
-                    $mask[$row][$col] = true;
-                }
+            // Calculate the number of pieces in this row
+            $rowOffset = abs($row - $mid);
+            $pieces = $size - $rowOffset; // Decreases by 1 as you move away from the center
+
+            if ($pieces < 8) {
+                continue; // Skip rows that are outside the hexagon
+            }
+
+            // Determine start and end columns for the current row
+            $startCol = floor(($size - $pieces) / 2);
+            $endCol = $startCol + $pieces - 1;
+
+            for ($col = $startCol; $col <= $endCol; $col++) {
+                $mask[$row][$col] = true;
             }
         }
 
@@ -319,6 +335,15 @@ class Nibble extends Table
     public function colorsNumber(): int
     {
         return count($this->colorsInfo());
+    }
+
+    public function boardSize(): int
+    {
+        if ($this->isHexagon()) {
+            return 15;
+        }
+
+        return $this->colorsNumber();
     }
 
     public function adjacentPieces(): int
