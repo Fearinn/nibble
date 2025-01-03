@@ -653,7 +653,6 @@ class Nibble extends Table
                 return true;
             }
 
-
             if ($opponentDiscsCount <= $this->colorsNumber() - $this->adjacentPieces()) {
                 $possibleAdjacent++;
 
@@ -718,7 +717,6 @@ class Nibble extends Table
         $board = $this->globals->get("board");
         $piecesCount = $this->piecesCount($board);
 
-        $adjacentCondition = [];
         $collection = $this->globals->get("collections")[$player_id];
         $orderedColors = $this->globals->get("orderedColors");
 
@@ -746,7 +744,7 @@ class Nibble extends Table
                 $adjacentColors = 0;
             }
 
-            if ($adjacentCondition === $this->adjacentColors()) {
+            if ($adjacentColors === $this->adjacentColors()) {
                 $winner_id = $player_id;
                 $win_condition = clienttranslate('${pieces_nbr} of ${colors_nbr} adjacent colors');
                 break;
