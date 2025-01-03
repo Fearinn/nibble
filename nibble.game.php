@@ -187,6 +187,10 @@ class Nibble extends Table
 
     function initializeBoard(int $size, int $colorsNumber): array
     {
+        if ($this->isHexagon()) {
+            return $this->hex_initializeBoard($size, $colorsNumber);
+        }
+
         $board = array_fill(0, $size, array_fill(0, $size, null));
         $colors = range(1, $colorsNumber); // Represent colors as numbers (1, 2, 3, ..., 9)
         $colorCounts = array_fill(1, $colorsNumber, 0); // Initialize color counts
@@ -199,10 +203,103 @@ class Nibble extends Table
         return $board;
     }
 
+    private function hex_isSafeColor(array $board, int $row, int $col, int $color): bool
+    {
+        $directions = [
+            [-1, 0], [1, 0], [0, -1], [0, 1], // Orthogonal neighbors
+            [-1, -1], [1, 1] // Diagonal neighbors for hexagons
+        ];
+
+        foreach ($directions as [$dRow, $dCol]) {
+            $nRow = $row + $dRow;
+            $nCol = $col + $dCol;
+
+            if (isset($board[$nRow][$nCol]) && $board[$nRow][$nCol] === $color) {
+                return false; // Adjacent disc has the same color
+            }
+        }
+
+        return true;
+    }
+
+    public function hex_placeDiscs(array &$board, array &$colorCounts, array $colors, array $mask, int $row = 0, int $col = 0): bool
+    {
+        $rows = count($board);
+        $cols = count($board[0]);
+
+        if ($row == $rows) {
+            return true;
+        }
+
+        $nextRow = $col == $cols - 1 ? $row + 1 : $row;
+        $nextCol = $col == $cols - 1 ? 0 : $col + 1;
+
+        if (!$mask[$row][$col]) {
+            return $this->hex_placeDiscs($board, $colorCounts, $colors, $mask, $nextRow, $nextCol); // Skip invalid cell
+        }
+
+        shuffle($colors);
+
+        foreach ($colors as $color) {
+            if ($this->hex_isSafeColor($board, $row, $col, $color) && $colorCounts[$color] < count($mask)) {
+                $board[$row][$col] = $color;
+                $colorCounts[$color]++;
+
+                if ($this->hex_placeDiscs($board, $colorCounts, $colors, $mask, $nextRow, $nextCol)) {
+                    return true;
+                }
+
+                $board[$row][$col] = null;
+                $colorCounts[$color]--;
+            }
+        }
+
+        return false;
+    }
+
+    public function hex_initializeBoard(): array
+    {
+        $size = 15;
+        $colorsNumber = 9;
+        $board = array_fill(0, $size, array_fill(0, $size, null));
+        $colors = range(1, $colorsNumber);
+        $colorCounts = array_fill(1, $colorsNumber, 0);
+
+        $mask = $this->generateHexagonMask($size);
+
+        if (!$this->hex_placeDiscs($board, $colorCounts, $colors, $mask)) {
+            throw new Exception("Failed to place discs on the board");
+        }
+
+        return $board;
+    }
+
+    public function generateHexagonMask(int $size): array
+    {
+        $mask = array_fill(0, $size, array_fill(0, $size, false));
+        $mid = floor($size / 2);
+
+        for ($row = 0; $row < $size; $row++) {
+            for ($col = 0; $col < $size; $col++) {
+                $dist = abs($row - $mid) + abs($col - $mid);
+                if ($dist <= $mid) {
+                    $mask[$row][$col] = true;
+                }
+            }
+        }
+
+        return $mask;
+    }
+
     public function is13Colors(): bool
     {
         $variant = (int) $this->getGameStateValue("variant");
         return $variant === 2 || $variant === 3;
+    }
+
+    public function isHexagon(): bool
+    {
+        return (int) $this->getGameStateValue("variant") === 3;
     }
 
     public function totalPieces(): int
