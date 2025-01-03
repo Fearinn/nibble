@@ -207,14 +207,7 @@ class Nibble extends Table
 
     private function hex_isSafeColor(array $board, int $row, int $col, int $color): bool
     {
-        $directions = [
-            [0, -1],
-            [0, 1], // Orthogonal neighbors
-            [-1, -1],
-            [-1, 0],
-            [1, -1],
-            [1, 0] // Diagonal neighbors for hexagons
-        ];
+        $directions = $this->hex_directions($row);
 
         foreach ($directions as [$dRow, $dCol]) {
             $nRow = $row + $dRow;
@@ -263,25 +256,7 @@ class Nibble extends Table
         return false;
     }
 
-    public function hex_initializeBoard(): array
-    {
-        $size = $this->boardSize();
-        $colorsNumber = $this->colorsNumber();
-
-        $board = array_fill(0, $size, array_fill(0, $size, null));
-        $colors = range(1, $colorsNumber);
-        $colorCounts = array_fill(1, $colorsNumber, 0);
-
-        $mask = $this->generateHexagonMask($size);
-
-        if (!$this->hex_placeDiscs($board, $colorCounts, $colors, $mask)) {
-            throw new Exception("Failed to place discs on the board");
-        }
-
-        return $board;
-    }
-
-    private function generateHexagonMask(int $size): array
+    private function hex_generateHexagonMask(int $size): array
     {
         $mask = array_fill(0, $size, array_fill(0, $size, false));
         $mid = floor($size / 2); // Center row index
@@ -305,6 +280,47 @@ class Nibble extends Table
         }
 
         return $mask;
+    }
+
+    public function hex_directions(int $row): array
+    {
+        if ($row % 2 !== 0) {
+            return [
+                [0, -1],
+                [0, 1], // Orthogonal neighbors
+                [-1, -1],
+                [-1, 0],
+                [1, -1],
+                [1, 0] // Diagonal neighbors
+            ];
+        }
+
+        return [
+            [0, -1],
+            [0, 1], // Orthogonal neighbors
+            [-1, 1],
+            [-1, 0],
+            [1, 1],
+            [1, 0] // Diagonal neighbors
+        ];
+    }
+
+    public function hex_initializeBoard(): array
+    {
+        $size = $this->boardSize();
+        $colorsNumber = $this->colorsNumber();
+
+        $board = array_fill(0, $size, array_fill(0, $size, null));
+        $colors = range(1, $colorsNumber);
+        $colorCounts = array_fill(1, $colorsNumber, 0);
+
+        $mask = $this->hex_generateHexagonMask($size);
+
+        if (!$this->hex_placeDiscs($board, $colorCounts, $colors, $mask)) {
+            throw new Exception("Failed to place discs on the board");
+        }
+
+        return $board;
     }
 
     public function is13Colors(): bool

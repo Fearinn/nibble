@@ -127,7 +127,7 @@ define([
           div.style.backgroundColor = color.name;
           this.addTooltip(
             div.id,
-            `${_(color.tr_name)} - (${card.column}, ${card.row})`,
+            `${_(color.tr_name)} - (${card.row}, ${card.column})`,
             ""
           );
 
@@ -144,7 +144,7 @@ define([
 
           if (this.nib.variants.isHexagon) {
             if (card.row % 2 === 0) {
-              div.style.left = "50%";
+              div.style.left = "53%";
             }
           }
         },
@@ -152,15 +152,18 @@ define([
         setupBackDiv: (card, div) => {},
       });
 
-      this.updateWinConWarn(this.nib.globals.playersNoInstaWin);
-
       const html = document.querySelector("html");
+      html.style.setProperty("--boardSize", this.nib.info.boardSize);
 
       if (this.nib.variants.is13Colors) {
         html.classList.add("nib_13colors");
       }
 
-      html.style.setProperty("--boardSize", this.nib.info.boardSize);
+      if (this.nib.variants.isHexagon) {
+        html.classList.add("nib_hexagon");
+      }
+
+      this.updateWinConWarn(this.nib.globals.playersNoInstaWin);
 
       /* BOARD */
       const boardElement = document.getElementById("nib_board");
