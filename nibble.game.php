@@ -762,7 +762,7 @@ class Nibble extends Table
 
             if ($adjacentColors === $this->adjacentColors()) {
                 $winner_id = $player_id;
-                $win_condition = clienttranslate('${pieces_nbr} of ${colors_nbr} adjacent colors');
+                $win_condition = clienttranslate('${pieces_nbr} pieces of ${colors_nbr} adjacent colors');
                 break;
             }
         }
@@ -927,6 +927,42 @@ class Nibble extends Table
         }
 
         throw new feException("Zombie mode not supported at this game state: " . $statename);
+    }
+
+    public function debug_winConWarn(): void
+    {
+        $playersNoInstaWin = [2392035];
+
+        $this->notifyAllPlayers(
+            "updateWinConWarn",
+            "",
+            [
+                "playersNoInstaWin" => $playersNoInstaWin,
+            ]
+        );
+    }
+
+    public function debug_announceWinner(int $player_id): void
+    {
+        $winner_id = $player_id;
+        $win_condition = clienttranslate('${pieces_nbr} pieces of ${colors_nbr} adjacent colors');
+
+        $this->notifyAllPlayers(
+            "announceWinner",
+            clienttranslate('${player_name} wins the game by ${win_condition}'),
+            [
+                "player_id" => $winner_id,
+                "player_name" => $this->getPlayerNameById($winner_id),
+                "win_condition" => [
+                    "log" => $win_condition,
+                    "args" => [
+                        "pieces_nbr" => $this->adjacentPieces(),
+                        "colors_nbr" => $this->adjacentColors(),
+                    ],
+                ],
+                "i18n" => ["win_condition"],
+            ]
+        );
     }
 
     public function debug_canInstaWin(int $player_id): bool

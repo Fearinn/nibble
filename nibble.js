@@ -127,7 +127,7 @@ define([
           div.style.backgroundColor = color.name;
           this.addTooltip(
             div.id,
-            `${_(color.tr_name)} - (${card.row}, ${card.column})`,
+          _(color.tr_name),
             ""
           );
 
@@ -292,10 +292,17 @@ define([
 
         const titleOrder = order === 1 ? -1 : 1;
 
+        const playerName =
+          player_id == this.player_id
+            ? this.format_string_recursive(_("You (${player_name})"), {
+                player_name: player.name,
+              })
+            : player.name;
+
         collectionsElement.innerHTML += `
           <div id="nib_collectionContainer:${player_id}"
           class="nib_collectionContainer" style="order: ${order};">
-            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}; order: ${titleOrder};">${player.name}</h3>
+            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}; order: ${titleOrder};">${playerName}</h3>
             <div id="nib_collection:${player_id}" class="nib_collection"></div>
           </div>
         `;
@@ -448,7 +455,19 @@ define([
           );
           winConWarnElement.style.backgroundColor = "red";
         } else {
-          warn = _("Your opponent can no longer get an instant win");
+          const player_id = playersNoInstaWin[0];
+          const player_name = this.nib.info.players[player_id].name;
+
+          warn = this.format_string_recursive(
+            _("${player_name} can no longer get an instant win"),
+            {
+              player_id: player_id,
+              player_name: player_name,
+            }
+          );
+        }
+
+        if (!this.isSpectator) {
           winConWarnElement.style.backgroundColor = "green";
         }
       }
@@ -512,9 +531,12 @@ define([
           }
 
           if (args.win_condition) {
-            args.win_condition = `<span class="nib_highlight-log">${_(
-              args.win_condition
-            )}</span>`;
+            const winCondition = this.format_string_recursive(
+              _(args.win_condition.log),
+              args.win_condition.args
+            );
+
+            args.win_condition = `<span class="nib_highlight-log">${winCondition}</span>`;
           }
         }
       } catch (e) {
