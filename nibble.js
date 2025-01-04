@@ -509,9 +509,12 @@ define([
           }
 
           if (args.win_condition) {
-            args.win_condition = `<span class="nib_highlight-log">${_(
-              args.win_condition
-            )}</span>`;
+            const winCondition = this.format_string_recursive(
+              _(args.win_condition.log),
+              args.win_condition.args,
+            );
+
+            args.win_condition = `<span class="nib_highlight-log">${winCondition}</span>`;
           }
         }
       } catch (e) {
