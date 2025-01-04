@@ -913,6 +913,19 @@ class Nibble extends Table
         throw new feException("Zombie mode not supported at this game state: " . $statename);
     }
 
+    public function debug_winConWarn(): void
+    {
+        $playersNoInstaWin = [2392035];
+
+        $this->notifyAllPlayers(
+            "updateWinConWarn",
+            "",
+            [
+                "playersNoInstaWin" => $playersNoInstaWin,
+            ]
+        );
+    }
+
     public function debug_announceWinner(int $player_id): void
     {
         $winner_id = $player_id;

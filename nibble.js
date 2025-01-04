@@ -445,7 +445,19 @@ define([
           );
           winConWarnElement.style.backgroundColor = "red";
         } else {
-          warn = _("Your opponent can no longer get an instant win");
+          const player_id = playersNoInstaWin[0];
+          const player_name = this.nib.info.players[player_id].name;
+
+          warn = this.format_string_recursive(
+            _("${player_name} can no longer get an instant win"),
+            {
+              player_id: player_id,
+              player_name: player_name,
+            }
+          );
+        }
+
+        if (!this.isSpectator) {
           winConWarnElement.style.backgroundColor = "green";
         }
       }
@@ -511,7 +523,7 @@ define([
           if (args.win_condition) {
             const winCondition = this.format_string_recursive(
               _(args.win_condition.log),
-              args.win_condition.args,
+              args.win_condition.args
             );
 
             args.win_condition = `<span class="nib_highlight-log">${winCondition}</span>`;
