@@ -127,7 +127,7 @@ define([
           div.style.backgroundColor = color.name;
           this.addTooltip(
             div.id,
-            `${_(color.tr_name)} - (${card.column}, ${card.row})`,
+          _(color.tr_name),
             ""
           );
 
@@ -289,10 +289,17 @@ define([
 
         const titleOrder = order === 1 ? -1 : 1;
 
+        const playerName =
+          player_id == this.player_id
+            ? this.format_string_recursive(_("You (${player_name})"), {
+                player_name: player.name,
+              })
+            : player.name;
+
         collectionsElement.innerHTML += `
           <div id="nib_collectionContainer:${player_id}"
           class="nib_collectionContainer" style="order: ${order};">
-            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}; order: ${titleOrder};">${player.name}</h3>
+            <h3 id="nib_collectionTitle" class="nib_collectionTitle" style="color: #${player.color}; order: ${titleOrder};">${playerName}</h3>
             <div id="nib_collection:${player_id}" class="nib_collection"></div>
           </div>
         `;
