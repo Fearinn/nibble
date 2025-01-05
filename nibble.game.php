@@ -288,21 +288,22 @@ class Nibble extends Table
             if ($row % 2 !== 0) {
                 return [
                     [0, -1],
-                    [0, 1], // Orthogonal neighbors
                     [-1, -1],
                     [-1, 0],
+                    [0, 1],
+                    [1, 0],
                     [1, -1],
-                    [1, 0] // Diagonal neighbors
                 ];
             }
 
             return [
                 [0, -1],
-                [0, 1], // Orthogonal neighbors
-                [-1, 1],
                 [-1, 0],
+                [-1, 1],
+                [0, 1],
                 [1, 1],
-                [1, 0] // Diagonal neighbors
+                [1, 0],
+
             ];
         }
 
@@ -454,6 +455,7 @@ class Nibble extends Table
         if ($this->isHexagon()) {
             return $this->hex_isSafeNeighbor($board, $row, $col);
         }
+
         // Check the orthogonal neighbors (up, down, left, right)
         $rows = count($board);
         $cols = count($board[0]);
@@ -588,18 +590,36 @@ class Nibble extends Table
 
     /* HEX CHECKS */
 
-    public function hex_isSafeNeighbor(array $board, int $row, int $col): bool
+    public function hex_isSafeNeighbor(array $board, int $row, int $col, $shift = 0): bool
     {
-        $openNeighbors = 6;
+        if ($shift >= 6) {
+            return false;
+        } 
+
+        $openNeighbors = 0;
         $directions = $this->directions($row);
 
-        foreach ($directions as [$x, $y]) {
-            if (isset($board[$row + $x][$col + $y])) {
-                $openNeighbors--;
+        for ($i = 0; $i < 6; $i++) {
+            $direction = $directions[($shift + $i) % 6];
+            [$x, $y] = $direction;
+
+            $nx = $row + $x;
+            $ny = $col + $y;
+
+            if (!isset($board[$nx][$ny])) {
+                $openNeighbors++;
+
+                if ($openNeighbors === 3) {
+                    return true;
+                }
+
+                continue;
             }
+
+            $openNeighbors = 0;
         }
 
-        return $openNeighbors >= 3;
+        return $this->hex_isSafeNeighbor($board, $row, $col, $shift + 1);
     }
 
     public function getCounts(?int $player_id = null): array
@@ -990,21 +1010,33 @@ class Nibble extends Table
         );
     }
 
-    public function debug_canInstaWin(int $player_id): bool
+    public function debug_canInstaWin(int $player_id): void
     {
-        return $this->canInstaWin($player_id);
+        $this->canInstaWin($player_id);
+    }
+
+    public function debug_isSafeNeighbor(): void
+    {
+        $board = $this->globals->get("board");
+
+        $result = $this->isSafeNeighbor($board, 7, 0);
+        throw new BgaUserException(json_encode($result));
     }
 
     public function debug_setBoard(): void
     {
         $size = $this->boardSize();
         $board = array_fill(0, $size, array_fill(0, $size, null));
+        $board[0][3] = 10;
+        $board[0][4] = 12;
         $board[1][2] = 1;
-        $board[1][3] = 4;
+        $board[1][3] = 2;
+        $board[1][5] = 8;
         $board[2][2] = 3;
         $board[2][3] = 4;
         $board[2][4] = 3;
-
+        $board[2][5] = 5;
+        
         $this->globals->set("board", $board);
     }
 
