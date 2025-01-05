@@ -207,7 +207,7 @@ class Nibble extends Table
 
     private function hex_isSafeColor(array $board, int $row, int $col, int $color): bool
     {
-        $directions = $this->hex_directions($row);
+        $directions = $this->directions($row);
 
         foreach ($directions as [$dRow, $dCol]) {
             $nRow = $row + $dRow;
@@ -282,26 +282,35 @@ class Nibble extends Table
         return $mask;
     }
 
-    public function hex_directions(int $row): array
+    public function directions(int $row): array
     {
-        if ($row % 2 !== 0) {
+        if ($this->isHexagon()) {
+            if ($row % 2 !== 0) {
+                return [
+                    [0, -1],
+                    [0, 1], // Orthogonal neighbors
+                    [-1, -1],
+                    [-1, 0],
+                    [1, -1],
+                    [1, 0] // Diagonal neighbors
+                ];
+            }
+
             return [
                 [0, -1],
                 [0, 1], // Orthogonal neighbors
-                [-1, -1],
+                [-1, 1],
                 [-1, 0],
-                [1, -1],
+                [1, 1],
                 [1, 0] // Diagonal neighbors
             ];
         }
 
         return [
             [0, -1],
-            [0, 1], // Orthogonal neighbors
-            [-1, 1],
+            [0, 1],
             [-1, 0],
-            [1, 1],
-            [1, 0] // Diagonal neighbors
+            [1, 0],
         ];
     }
 
@@ -440,8 +449,11 @@ class Nibble extends Table
         return count($components) === 1;
     }
 
-    public function isSafeNeighbor(array $board, int $row, int $col)
+    public function isSafeNeighbor(array $board, int $row, int $col): bool
     {
+        if ($this->isHexagon()) {
+            return $this->hex_isSafeNeighbor($board, $row, $col);
+        }
         // Check the orthogonal neighbors (up, down, left, right)
         $rows = count($board);
         $cols = count($board[0]);
@@ -490,7 +502,7 @@ class Nibble extends Table
         return $components;
     }
 
-    public function floodFill($board, $x, $y, &$visited, &$component)
+    public function floodFill($board, $x, $y, &$visited, &$component): void
     {
         $stack = [[$x, $y]];
 
@@ -502,17 +514,14 @@ class Nibble extends Table
                 $component[] = [$cx, $cy];
 
                 // Add orthogonal neighbors to the stack
-                $neighbors = [
-                    [$cx - 1, $cy],
-                    [$cx + 1, $cy],
-                    [$cx, $cy - 1],
-                    [$cx, $cy + 1]
-                ];
+                $directions = $this->directions($cx);
 
-                foreach ($neighbors as $neighbor) {
-                    list($nx, $ny) = $neighbor;
+                foreach ($directions as [$dx, $dy]) {
+                    $nx = $cx + $dx;
+                    $ny = $cy + $dy;
+
                     if (isset($board[$nx][$ny]) && $board[$nx][$ny] !== null) {
-                        $stack[] = $neighbor;
+                        $stack[] = [$nx, $ny];
                     }
                 }
             }
@@ -526,14 +535,14 @@ class Nibble extends Table
         }
 
         $colorsNumber = $this->colorsNumber();
+        $boardSize = $this->boardSize();
 
-        $possible_keys = ["row", "column", "color_id"];
-        $possible_positions = range(0, $colorsNumber - 1);
+        $possible_keys = ["row", "column", "color_id", "location"];
+        $possible_positions = range(0, $boardSize - 1);
         $possible_colors = range(1, $colorsNumber);
 
         $board = $this->globals->get("board");
         $components = [];
-        $visited = [];
 
         $currentColor = null;
         foreach ($discs as $index => $disc) {
@@ -575,6 +584,22 @@ class Nibble extends Table
                 throw new BgaUserException($this->_("Illegal move: you can't divide the pieces into separate two groups"));
             }
         }
+    }
+
+    /* HEX CHECKS */
+
+    public function hex_isSafeNeighbor(array $board, int $row, int $col): bool
+    {
+        $openNeighbors = 6;
+        $directions = $this->directions($row);
+
+        foreach ($directions as [$x, $y]) {
+            if (isset($board[$row + $x][$col + $y])) {
+                $openNeighbors--;
+            }
+        }
+
+        return $openNeighbors >= 3;
     }
 
     public function getCounts(?int $player_id = null): array
@@ -828,7 +853,7 @@ class Nibble extends Table
             if (
                 !in_array($disc, $legalMoves)
             ) {
-                throw new BgaVisibleSystemException("You can't take these disc now: $disc_color, $activeColor");
+                throw new BgaVisibleSystemException("You can't take this disc now: $disc_color, $activeColor");
             }
 
             if (!$activeColor) {
@@ -972,107 +997,14 @@ class Nibble extends Table
 
     public function debug_setBoard(): void
     {
-        $board = [
-            0 => [
-                0 => null,
-                1 => null,
-                2 => 1,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-            1 => [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-            2 => [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-            3 => [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-            4 => [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-            5 => [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-            6 => [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-            7 => [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-            8 => [
-                0 => null,
-                1 => null,
-                2 => null,
-                3 => null,
-                4 => null,
-                5 => null,
-                6 => null,
-                7 => null,
-                8 => null,
-            ],
-        ];
+        $size = $this->boardSize();
+        $board = array_fill(0, $size, array_fill(0, $size, null));
+        $board[1][2] = 1;
+        $board[1][3] = 4;
+        $board[2][2] = 3;
+        $board[2][3] = 4;
+        $board[2][4] = 3;
+
         $this->globals->set("board", $board);
     }
 
