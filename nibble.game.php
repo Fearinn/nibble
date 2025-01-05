@@ -594,7 +594,7 @@ class Nibble extends Table
     {
         if ($shift >= 6) {
             return false;
-        } 
+        }
 
         $openNeighbors = 0;
         $directions = $this->directions($row);
@@ -887,14 +887,23 @@ class Nibble extends Table
             $collections[$player_id][$disc_color][] = $disc;
             $this->globals->set("collections", $collections);
 
+            $log_column = $disc_column + 1;
+            $log_row = $disc_row + 1;
+
+            if ($this->isHexagon()) {
+                if ($disc_row % 2 === 0) {
+                    $log_column += 0.5;
+                }
+            }
+
             $this->notifyAllPlayers(
                 "takeDisc",
                 clienttranslate('${player_name} takes a ${color_label} piece (${column}, ${row})'),
                 [
                     "player_id" => $player_id,
                     "player_name" => $this->getPlayerNameById($player_id),
-                    "row" => $disc_row + 1,
-                    "column" => $disc_column + 1,
+                    "row" => $log_row,
+                    "column" => $log_column,
                     "disc" => $disc,
                     "color_label" => $this->colorsInfo()[$activeColor]["tr_name"],
                     "i18n" => ["color_label"],
@@ -1036,7 +1045,7 @@ class Nibble extends Table
         $board[2][3] = 4;
         $board[2][4] = 3;
         $board[2][5] = 5;
-        
+
         $this->globals->set("board", $board);
     }
 
