@@ -125,11 +125,7 @@ define([
           div.style.position = "relative";
 
           div.style.backgroundColor = color.name;
-          this.addTooltip(
-            div.id,
-          _(color.tr_name),
-            ""
-          );
+          this.addTooltip(div.id, _(color.tr_name), "");
 
           const colorblindHelp = document.createElement("span");
           colorblindHelp.textContent = this.nib.info.colorblindHelp[color_id];
@@ -139,7 +135,6 @@ define([
           )
             ? "white"
             : "black";
-
           div.appendChild(colorblindHelp);
 
           if (this.nib.variants.isHexagon) {
@@ -370,7 +365,11 @@ define([
 
         const collections = this.nib.globals.collections[player_id];
         for (const color_id in this.nib.info.colors) {
-          const discs = collections?.[color_id];
+          const discs = collections?.[color_id]?.map((disc) => {
+            disc.location = "collection";
+            disc.location_arg = player_id;
+            return disc;
+          });
 
           if (discs) {
             this.nib.stocks[player_id].collection.addCards(discs);
@@ -499,9 +498,10 @@ define([
       const disc = notif.args.disc;
       const color_id = notif.args.color_id;
 
+      disc.location = "collection";
       this.nib.stocks[player_id].collection.addCard(disc);
-      this.nib.managers.counters[player_id][color_id].incValue(1);
 
+      this.nib.managers.counters[player_id][color_id].incValue(1);
       this.nib.selections.color = null;
     },
 

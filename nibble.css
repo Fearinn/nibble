@@ -16,6 +16,7 @@
 html {
   --pieceSize: 60px;
   --pieceSizeSM: 30px;
+  --boardRowGap: 4px;
 }
 
 .bga-cards_disabled-card {
@@ -178,6 +179,7 @@ html:not(.nib_hexagon) [data-variant="15"] {
 }
 
 .nib_collection .nib_disc {
+  left: 0 !important;
   height: var(--pieceSizeSM);
   width: var(--pieceSizeSM);
 }
@@ -217,6 +219,7 @@ html:not(.nib_hexagon) [data-variant="15"] {
 
 .nib_selectedDisc {
   border-radius: 0;
+  z-index: 2;
 }
 
 .nib_selectedDisc div {
