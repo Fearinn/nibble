@@ -125,11 +125,7 @@ define([
           div.style.position = "relative";
 
           div.style.backgroundColor = color.name;
-          this.addTooltip(
-            div.id,
-          _(color.tr_name),
-            ""
-          );
+          this.addTooltip(div.id, _(color.tr_name), "");
 
           const colorblindHelp = document.createElement("span");
           colorblindHelp.textContent = this.nib.info.colorblindHelp[color_id];
@@ -279,6 +275,13 @@ define([
 
           const count = this.nib.counts[player_id][color_id] || 0;
           counter.setValue(count);
+
+          const color = this.nib.info.colors[color_id];
+          this.addTooltip(
+            `nib_counter:${player_id}-${color_id}`,
+            _(color.tr_name),
+            ""
+          );
         }
 
         const collectionsElement = document.getElementById("nib_collections");
