@@ -21,8 +21,8 @@
         "name": "Disc"
       },
       "2": {
-        "name": "Square",
-        "cssPref": "nib_square"
+        "name": "Polygon",
+        "cssPref": "nib_polygon"
       }
     },
     "default": 2

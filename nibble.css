@@ -37,13 +37,13 @@ html {
   padding: 1px;
 }
 
-.nib_square .nib_disc,
-.nib_square .nib_disc div {
+.nib_polygon .nib_disc,
+.nib_polygon .nib_disc div {
   border-radius: 0 !important;
 }
 
-.nib_square .nib_selectedDisc,
-.nib_square .nib_selectedDisc div {
+.nib_polygon .nib_selectedDisc,
+.nib_polygon .nib_selectedDisc div {
   border-radius: 100% !important;
 }
 
@@ -63,6 +63,11 @@ html:not(.nib_13colors) [data-variant="13"] {
 
 .nib_hexagon {
   --boardRowGap: 0;
+}
+
+.nib_hexagon.nib_polygon .nib_disc:not(.nib_selectedDisc) {
+  /* clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); */
+  clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
 }
 
 html:not(.nib_hexagon) [data-variant="15"] {
