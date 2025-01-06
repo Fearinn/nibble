@@ -3,7 +3,8 @@
     "name": "Variant",
     "values": {
       "1": {
-        "name": "Original"
+        "name": "Original",
+        "description": "The original game rules, with 9 colors with 9 pieces each"
       },
       "2": {
         "name": "13 colors",
