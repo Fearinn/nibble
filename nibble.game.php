@@ -575,6 +575,10 @@ class Nibble extends Table
                 return;
             }
 
+            if ($this->isHexagon()) {
+                return;
+            }
+
             $x = (int) $disc["row"];
             $y = (int) $disc["column"];
             $board[$x][$y] = null;
