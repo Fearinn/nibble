@@ -107,7 +107,7 @@ class Nibble extends Table
             "players" => $this->getCollectionFromDb($sql),
             "board" => $this->globals->get("board"),
             "orderedColors" => $this->globals->get("orderedColors"),
-            "legalMoves" => $this->calcLegalMoves(),
+            "legalMoves" => $this->calcLegalMoves(true),
             "collections" => $this->globals->get("collections"),
             "counts" => $this->getCounts(),
             "playersNoInstaWin" => $this->globals->get("playersNoInstaWin", []),
@@ -397,7 +397,7 @@ class Nibble extends Table
     public function calcLegalMoves(bool $useCached = false): array
     {
         if ($useCached) {
-            $cached = $this->globals->get("legalMoves");
+            $cached = $this->globals->get("legalMoves", null);
 
             if ($cached !== null) {
                 return $cached;
