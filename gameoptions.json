@@ -13,7 +13,7 @@
       },
       "3": {
         "name": "13-color hex",
-        "description": "169 pieces are placed as a 8-sided hexagon. Each piece has 6 adjacent pieces around it. You may only take pieces with at least 3 consecutive open sides. All other rules are like the '13 colors' variant",
+        "description": "The pieces are arranged in a hexagon instead of a square. All rules are the same as the '13 colors' variant, except that you may only take pieces if they have at least three adjacent sides exposed, not two",
         "alpha": true
       }
     },
