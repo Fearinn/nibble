@@ -12,6 +12,7 @@
       },
       "3": {
         "name": "13-color hex",
+        "description": "The pieces are placed as a 8-sided hexagon. Each piece has 6 adjacent pieces around it. You may only take pieces with at least 3 consecutive open sides. All other rules are like the '13 colors' variant",
         "alpha": true
       }
     },
