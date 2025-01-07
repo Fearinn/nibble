@@ -123,8 +123,8 @@ define([
           div.style.gridRow = card.row + 1;
           div.style.gridColumn = card.column + 1;
           div.style.position = "relative";
-
-          div.style.backgroundColor = color.name;
+        
+          div.querySelector(".card-sides").style.backgroundColor = color.name;
           this.addTooltip(div.id, _(color.tr_name), "");
 
           const colorblindHelp = document.createElement("span");

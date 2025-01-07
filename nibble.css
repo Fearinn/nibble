@@ -65,12 +65,32 @@ html:not(.nib_13colors) [data-variant="13"] {
   --boardRowGap: 0;
 }
 
-.nib_hexagon.nib_polygon .nib_disc:not(.nib_selectedDisc) {
+.nib_hexagon.nib_polygon .nib_disc:not(.nib_selectedDisc) .card-sides,
+.nib_hexagon:not(.nib_polygon) .nib_selectedDisc .card-sides,
+.nib_hexagon.nib_polygon .nib_disc-counter {
   clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
 }
 
-.nib_hexagon:not(.nib_polygon) .nib_selectedDisc {
+.nib_hexagon.nib_polygon .nib_disc:not(.nib_selectedDisc)::before,
+.nib_hexagon:not(.nib_polygon) .nib_selectedDisc::before {
+  position: relative;
+  display: block;
+  content: "";
   clip-path: polygon(0% 25%, 0% 75%, 50% 100%, 100% 75%, 100% 25%, 50% 0%);
+  background-color: rgba(0, 0, 0, 0.75);
+  height: calc(var(--pieceSize) * 1.05);
+  width: calc(var(--pieceSize) * 1.05);
+}
+
+.nib_hexagon .nib_collection .nib_disc:not(.nib_selectedDisc)::before,
+.nib_hexagon .nib_collection .nib_selectedDisc::before {
+  height: calc(var(--pieceSizeSM) * 1.01);
+  width: calc(var(--pieceSizeSM) * 1.01);
+}
+
+.nib_hexagon .nib_counter .nib_disc:not(.nib_selectedDisc)::before,
+.nib_hexagon .nib_counter .nib_selectedDisc::before {
+  display: none;
 }
 
 html:not(.nib_hexagon) [data-variant="15"] {
