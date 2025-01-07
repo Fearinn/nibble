@@ -76,6 +76,7 @@ define([
       this.nib.globals.legalMoves = gamedatas.legalMoves;
       this.nib.globals.collections = gamedatas.collections;
       this.nib.globals.playersNoInstaWin = gamedatas.playersNoInstaWin;
+      this.nib.globals.majorityOwner = gamedatas.majorityOwner;
 
       this.nib.managers.zoom = new ZoomManager({
         element: document.getElementById("nib_gameArea"),
@@ -158,7 +159,10 @@ define([
         html.classList.add("nib_hexagon");
       }
 
-      this.updateWinConWarn(this.nib.globals.playersNoInstaWin);
+      this.updateWinConWarn(
+        this.nib.globals.playersNoInstaWin,
+        this.nib.globals.majorityOwner
+      );
 
       /* BOARD */
       const boardElement = document.getElementById("nib_board");
@@ -443,9 +447,57 @@ define([
       this.bgaPerformAction(action, args);
     },
 
-    updateWinConWarn: function (playersNoInstaWin) {
+    updateWinConWarn: function (playersNoInstaWin, majorityOwner) {
       const winConWarnElement = document.getElementById("nib_winConWarn");
       warn = _("Both players can still get an instant win");
+
+      if (majorityOwner) {
+        if (playersNoInstaWin.length === 0) {
+          if (majorityOwner == this.player_id) {
+            warn = _(
+              "You have the majority of majorities, but both players can still get an instant win!"
+            );
+          } else {
+            const playerName = this.nib.info.players[majorityOwner].name;
+            warn = this.format_string_recursive(
+              _(
+                "${player_name} has the majority of majorities, but both players can still get an instant win!"
+              ),
+              {
+                player_name: playerName,
+              }
+            );
+          }
+        }
+
+        if (playersNoInstaWin.length === 1) {
+          const player_id = playersNoInstaWin[0];
+          const playerName = this.nib.info.players[player_id].name;
+          if (player_id == this.player_id) {
+            warn = this.format_string_recursive(
+              _(
+                "You have the majority of majorities, but ${player_name} can still get an instant win!"
+              ),
+              {
+                player_name: playerName,
+              }
+            );
+          } else {
+            warn = this.format_string_recursive(
+              _(
+                "${player_name} has the majority of majorities, but you can still get an instant win!"
+              ),
+              {
+                player_name: playerName,
+              }
+            );
+          }
+        }
+
+        winConWarnElement.style.backgroundColor = "yellow";
+        winConWarnElement.textContent = warn;
+        return;
+      }
 
       if (playersNoInstaWin.length === 2) {
         warn = _(
@@ -514,7 +566,8 @@ define([
 
     notif_updateWinConWarn: function (notif) {
       const playersNoInstaWin = notif.args.playersNoInstaWin;
-      this.updateWinConWarn(playersNoInstaWin);
+      const majorityOwner = notif.args.majorityOwner;
+      this.updateWinConWarn(playersNoInstaWin, majorityOwner);
     },
 
     // @Override

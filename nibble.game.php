@@ -111,6 +111,7 @@ class Nibble extends Table
             "collections" => $this->globals->get("collections"),
             "counts" => $this->getCounts(),
             "playersNoInstaWin" => $this->globals->get("playersNoInstaWin", []),
+            "majorityOwner" => $this->majorityOfMajorities(),
         ];
 
         return $result;
@@ -767,6 +768,7 @@ class Nibble extends Table
                 "",
                 [
                     "playersNoInstaWin" => $playersNoInstaWin,
+                    "majorityOwner" => $this->majorityOfMajorities(),
                 ]
             );
         }
@@ -989,13 +991,14 @@ class Nibble extends Table
 
     public function debug_winConWarn(): void
     {
-        $playersNoInstaWin = [2392035];
+        $playersNoInstaWin = [2392034];
 
         $this->notifyAllPlayers(
             "updateWinConWarn",
             "",
             [
                 "playersNoInstaWin" => $playersNoInstaWin,
+                "majorityOwner" => null,
             ]
         );
     }
