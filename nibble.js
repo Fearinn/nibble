@@ -123,7 +123,7 @@ define([
           div.style.gridRow = card.row + 1;
           div.style.gridColumn = card.column + 1;
           div.style.position = "relative";
-        
+
           div.querySelector(".card-sides").style.backgroundColor = color.name;
           this.addTooltip(div.id, _(color.tr_name), "");
 
@@ -471,10 +471,10 @@ define([
               player_name: player_name,
             }
           );
-        }
 
-        if (!this.isSpectator) {
-          winConWarnElement.style.backgroundColor = "green";
+          if (!this.isSpectator) {
+            winConWarnElement.style.backgroundColor = "green";
+          }
         }
       }
 
