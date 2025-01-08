@@ -241,7 +241,7 @@ class Nibble extends Table
         shuffle($colors);
 
         foreach ($colors as $color) {
-            if ($this->hex_isSafeColor($board, $row, $col, $color) && $colorCounts[$color] < count($mask)) {
+            if ($this->hex_isSafeColor($board, $row, $col, $color) && $colorCounts[$color] < count($colors)) {
                 $board[$row][$col] = $color;
                 $colorCounts[$color]++;
 
