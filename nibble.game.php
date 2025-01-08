@@ -991,14 +991,14 @@ class Nibble extends Table
 
     public function debug_winConWarn(): void
     {
-        $playersNoInstaWin = [2392034];
+        $playersNoInstaWin = [2392035];
 
         $this->notifyAllPlayers(
             "updateWinConWarn",
             "",
             [
                 "playersNoInstaWin" => $playersNoInstaWin,
-                "majorityOwner" => null,
+                "majorityOwner" => 2392035,
             ]
         );
     }

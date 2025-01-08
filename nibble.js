@@ -471,9 +471,15 @@ define([
         }
 
         if (playersNoInstaWin.length === 1) {
-          const player_id = playersNoInstaWin[0];
-          const playerName = this.nib.info.players[player_id].name;
-          if (player_id == this.player_id) {
+          let playerName = "your opponent";
+
+          for (const player_id in this.nib.info.players) {
+            if (player_id != playersNoInstaWin[0]) {
+              playerName = this.nib.info.players[player_id].name;
+            }
+          }
+
+          if (playersNoInstaWin.includes(this.player_id)) {
             warn = this.format_string_recursive(
               _(
                 "You have the majority of majorities, but ${player_name} can still get an instant win!"
@@ -482,13 +488,26 @@ define([
                 player_name: playerName,
               }
             );
-          } else {
+          } else if (!this.isSpectator) {
             warn = this.format_string_recursive(
               _(
                 "${player_name} has the majority of majorities, but you can still get an instant win!"
               ),
               {
                 player_name: playerName,
+              }
+            );
+          } else {
+            const player_id2 = playersNoInstaWin[0];
+            const playerName2 = this.nib.info.players[player_id2].name;
+
+            warn = this.format_string_recursive(
+              _(
+                "${player_name2} has the majority of majorities, but ${player_name} can still get an instant win!"
+              ),
+              {
+                player_name: playerName,
+                player_name2: playerName2,
               }
             );
           }
