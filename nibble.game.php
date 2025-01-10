@@ -62,6 +62,9 @@ class Nibble extends Table
         /************ Start the game initialization *****/
         foreach ($players as $player_id => $player) {
             $this->initStat("player", "piecesCollected", 0, $player_id);
+            $this->initStat("player", "majorityOfMajorities", 0, $player_id);
+            $this->initStat("player", "adjacentColors", 0, $player_id);
+            $this->initStat("player", "allOfOneColor", 0, $player_id);
 
             foreach ($this->colorsInfo() as $color_id => $color) {
                 $this->initStat("player", "$color_id:collected", 0, $player_id);
@@ -802,6 +805,7 @@ class Nibble extends Table
             if ($discsCount === $colorsNumber) {
                 $winner_id = $player_id;
                 $win_condition = clienttranslate("all pieces of one color");
+                $this->incStat(1, "allOfOneColor", $player_id);
                 break;
             }
 
@@ -814,6 +818,7 @@ class Nibble extends Table
             if ($adjacentColors === $this->adjacentColors()) {
                 $winner_id = $player_id;
                 $win_condition = clienttranslate('${pieces_nbr} pieces of ${colors_nbr} adjacent colors');
+                $this->incStat(1, "adjacentColors", $player_id);
                 break;
             }
         }
@@ -827,6 +832,7 @@ class Nibble extends Table
             if (!$canInstaWin || $piecesCount === 0) {
                 $winner_id = $majorityHolder_id;
                 $win_condition = clienttranslate("majority of majorities");
+                $this->incStat(1, "majorityOfMajorities", $player_id);
             }
         }
 
@@ -987,6 +993,12 @@ class Nibble extends Table
         }
 
         throw new feException("Zombie mode not supported at this game state: " . $statename);
+    }
+
+    public function debug_stat(int $player_id): void {
+        $this->incStat(1, "majorityOfMajorities", $player_id);
+        $this->incStat(1, "adjacentColors", $player_id);
+        $this->incStat(1, "allOfOneColor", $player_id);
     }
 
     public function debug_winConWarn(): void

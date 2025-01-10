@@ -1,5 +1,20 @@
 {
   "player": {
+    "majorityOfMajorities": {
+      "id": 24,
+      "name": "Wins by majorities of majorities",
+      "type": "int"
+    },
+    "adjacentColors": {
+      "id": 25,
+      "name": "Wins by adjacent colors",
+      "type": "int"
+    },
+    "allOfOneColor": {
+      "id": 26,
+      "name": "Wins by all pieces of one color",
+      "type": "int"
+    },
     "piecesCollected": {
       "id": 19,
       "name": "Total pieces collected",
