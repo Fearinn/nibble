@@ -568,6 +568,7 @@ define([
 
       dojo.subscribe("takeDisc", this, "notif_takeDisc");
       dojo.subscribe("updateWinConWarn", this, "notif_updateWinConWarn");
+      dojo.subscribe("announceWinner", this, "notif_announceWinner");
       this.notifqueue.setSynchronous("takeDisc", 500);
     },
 
@@ -587,6 +588,10 @@ define([
       const playersNoInstaWin = notif.args.playersNoInstaWin;
       const majorityOwner = notif.args.majorityOwner;
       this.updateWinConWarn(playersNoInstaWin, majorityOwner);
+    },
+
+    notif_announceWinner: function (notif) {
+      document.getElementById("nib_winConWarn").remove();
     },
 
     // @Override

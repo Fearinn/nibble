@@ -950,15 +950,13 @@ class Nibble extends Table
     {
         $player_id = (int) $this->getActivePlayerId();
 
-        $this->updateWinConWarn();
-
         if ($this->isGameEnd($player_id)) {
             $this->gamestate->nextState("gameEnd");
             return;
         }
 
+        $this->updateWinConWarn();
         $this->globals->set("activeColor", null);
-
         $this->calcLegalMoves();
 
         $this->giveExtraTime($player_id);
