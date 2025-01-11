@@ -823,16 +823,18 @@ class Nibble extends Table
             }
         }
 
-        $majorityHolder_id = $this->majorityOfMajorities();
+        if ($winner_id === null) {
+            $majorityHolder_id = $this->majorityOfMajorities();
 
-        if ($majorityHolder_id !== null) {
-            $loser_id = $this->getPlayerAfter($majorityHolder_id);
-            $canInstaWin = $this->canInstaWin($loser_id);
+            if ($majorityHolder_id !== null) {
+                $loser_id = $this->getPlayerAfter($majorityHolder_id);
+                $canInstaWin = $this->canInstaWin($loser_id);
 
-            if (!$canInstaWin || $piecesCount === 0) {
-                $winner_id = $majorityHolder_id;
-                $win_condition = clienttranslate("majority of majorities");
-                $this->incStat(1, "majorityOfMajorities", $player_id);
+                if (!$canInstaWin || $piecesCount === 0) {
+                    $winner_id = $majorityHolder_id;
+                    $win_condition = clienttranslate("majority of majorities");
+                    $this->incStat(1, "majorityOfMajorities", $player_id);
+                }
             }
         }
 
@@ -993,10 +995,15 @@ class Nibble extends Table
         throw new feException("Zombie mode not supported at this game state: " . $statename);
     }
 
-    public function debug_stat(int $player_id): void {
+    public function debug_stat(int $player_id): void
+    {
         $this->incStat(1, "majorityOfMajorities", $player_id);
         $this->incStat(1, "adjacentColors", $player_id);
         $this->incStat(1, "allOfOneColor", $player_id);
+    }
+
+    public function debug_calcLegalMoves(): void {
+        $this->calcLegalMoves(false);
     }
 
     public function debug_winConWarn(): void
@@ -1011,6 +1018,17 @@ class Nibble extends Table
                 "majorityOwner" => 2392035,
             ]
         );
+    }
+
+    public function debug_collections(): void {
+        $collections = $this->globals->get("collections");
+        $collections[2392035][1] = range(1, 8);
+        $collections[2392035][2] = range(9, 16); 
+        $collections[2392035][4] = range(17, 24); 
+        $collections[2392035][5] = range(25, 32); 
+        $collections[2392035][7] = range(33, 40); 
+        $collections[2392035][9] = range(41, 48); 
+        $this->globals->set("collections", $collections);
     }
 
     public function debug_announceWinner(int $player_id): void
@@ -1053,15 +1071,15 @@ class Nibble extends Table
     {
         $size = $this->boardSize();
         $board = array_fill(0, $size, array_fill(0, $size, null));
-        $board[0][3] = 10;
-        $board[0][4] = 12;
-        $board[1][2] = 1;
-        $board[1][3] = 2;
-        $board[1][5] = 8;
-        $board[2][2] = 3;
-        $board[2][3] = 4;
-        $board[2][4] = 3;
-        $board[2][5] = 5;
+        $board[0][0] = 1;
+        // $board[0][4] = 12;
+        // $board[1][2] = 1;
+        // $board[1][3] = 2;
+        // $board[1][5] = 8;
+        // $board[2][2] = 3;
+        // $board[2][3] = 4;
+        // $board[2][4] = 3;
+        // $board[2][5] = 5;
 
         $this->globals->set("board", $board);
     }
