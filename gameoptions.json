@@ -8,13 +8,11 @@
       },
       "2": {
         "name": "13 colors",
-        "description": "13 colors with 13 pieces each. Instant win conditions are 13 pieces of one color or 10 pieces of three adjacent colors",
-        "alpha": true
+        "description": "13 colors with 13 pieces each. Instant win conditions are 13 pieces of one color or 10 pieces of three adjacent colors"
       },
       "3": {
         "name": "13-color hex",
-        "description": "The pieces are arranged in a hexagon instead of a square. All rules are the same as the '13 colors' variant, except that you may only take pieces if they have at least three adjacent sides exposed, not two",
-        "alpha": true
+        "description": "The pieces are arranged in a hexagon instead of a square. All rules are the same as the '13 colors' variant, except that you may only take pieces if they have at least three adjacent sides exposed, not two"
       }
     },
     "default": 1
