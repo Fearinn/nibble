@@ -471,7 +471,7 @@ define([
         }
 
         if (playersNoInstaWin.length === 1) {
-          let playerName = "your opponent";
+          let playerName = _("your opponent");
 
           for (const player_id in this.nib.info.players) {
             if (player_id != playersNoInstaWin[0]) {
@@ -489,6 +489,9 @@ define([
               }
             );
           } else if (!this.isSpectator) {
+            const player_id = playersNoInstaWin[0];
+            const playerName = this.nib.info.players[player_id].name;
+            
             warn = this.format_string_recursive(
               _(
                 "${player_name} has the majority of majorities, but you can still get an instant win!"
