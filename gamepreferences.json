@@ -40,5 +40,23 @@
       }
     },
     "default": 0
+  },
+  "103": {
+    "name": "Highlighting of selectable pieces",
+    "needReload": true,
+    "values": {
+      "1": {
+        "name": "Opacity"
+      },
+      "2": {
+        "name": "Scale",
+        "cssPref": "nib_selectableWithScale"
+      },
+      "3": {
+        "name": "Opacity and scale",
+        "cssPref": "nib_selectableWithOpacityScale"
+      }
+    },
+    "default": 2
   }
 }

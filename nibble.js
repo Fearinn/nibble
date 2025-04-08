@@ -115,6 +115,8 @@ define([
         cardHeight: 60,
         cardWidth: 60,
         selectedCardClass: "nib_selectedDisc",
+        selectableCardClass: "nib_selectableDisc",
+        unselectableCardClass: "nib_unselectableDisc",
         getId: (card) => `disc-row_${card.row}-col_${card.column}`,
         setupDiv: (card, div) => {
           const color_id = card.color_id;

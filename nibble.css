@@ -19,8 +19,23 @@ html {
   --boardRowGap: 4px;
 }
 
-.bga-cards_disabled-card {
-  opacity: 0.75;
+.nib_selectableDisc {
+  cursor: pointer;
+}
+
+.nib_unselectableDisc {
+  opacity: 0.6;
+  filter: 0 !important;
+  cursor: not-allowed;
+}
+
+.nib_selectableWithOpacityScale .nib_unselectableDisc {
+  transform: scale(0.8);
+}
+
+.nib_selectableWithScale .nib_unselectableDisc {
+  opacity: 1;
+  transform: scale(0.8);
 }
 
 .nib_colorblindHelp {
