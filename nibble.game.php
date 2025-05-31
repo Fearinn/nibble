@@ -751,7 +751,6 @@ class Nibble extends Table
     public function updateWinConWarn(): void
     {
         $playersNoInstaWin = $this->globals->get("playersNoInstaWin", []);
-        $updated = false;
 
         $players = $this->loadPlayersBasicInfos();
         foreach ($players as $player_id => $player) {
@@ -762,19 +761,16 @@ class Nibble extends Table
             }
 
             $playersNoInstaWin[] = $player_id;
-            $updated = true;
         }
 
-        if ($updated) {
-            $this->notifyAllPlayers(
-                "updateWinConWarn",
-                "",
-                [
-                    "playersNoInstaWin" => $playersNoInstaWin,
-                    "majorityOwner" => $this->majorityOfMajorities(),
-                ]
-            );
-        }
+        $this->notifyAllPlayers(
+            "updateWinConWarn",
+            "",
+            [
+                "playersNoInstaWin" => $playersNoInstaWin,
+                "majorityOwner" => $this->majorityOfMajorities(),
+            ]
+        );
 
         $this->globals->set("playersNoInstaWin", $playersNoInstaWin);
     }
@@ -1002,7 +998,8 @@ class Nibble extends Table
         $this->incStat(1, "allOfOneColor", $player_id);
     }
 
-    public function debug_calcLegalMoves(): void {
+    public function debug_calcLegalMoves(): void
+    {
         $this->calcLegalMoves(false);
     }
 
@@ -1020,14 +1017,15 @@ class Nibble extends Table
         );
     }
 
-    public function debug_collections(): void {
+    public function debug_collections(): void
+    {
         $collections = $this->globals->get("collections");
         $collections[2392035][1] = range(1, 8);
-        $collections[2392035][2] = range(9, 16); 
-        $collections[2392035][4] = range(17, 24); 
-        $collections[2392035][5] = range(25, 32); 
-        $collections[2392035][7] = range(33, 40); 
-        $collections[2392035][9] = range(41, 48); 
+        $collections[2392035][2] = range(9, 16);
+        $collections[2392035][4] = range(17, 24);
+        $collections[2392035][5] = range(25, 32);
+        $collections[2392035][7] = range(33, 40);
+        $collections[2392035][9] = range(41, 48);
         $this->globals->set("collections", $collections);
     }
 
