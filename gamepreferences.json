@@ -1,7 +1,6 @@
 {
   "100": {
     "name": "Colorblind support",
-    "needReload": true,
     "values": {
       "0": {
         "name": "Disabled"
@@ -15,7 +14,6 @@
   },
   "101": {
     "name": "Piece format",
-    "needReload": true,
     "values": {
       "1": {
         "name": "Disc"
@@ -29,7 +27,6 @@
   },
   "102": {
     "name": "Reduce brightness",
-    "needReload": true,
     "values": {
       "0": {
         "name": "Disabled"
@@ -43,7 +40,6 @@
   },
   "103": {
     "name": "Highlighting of selectable pieces",
-    "needReload": true,
     "values": {
       "1": {
         "name": "Opacity"
