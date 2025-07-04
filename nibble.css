@@ -112,7 +112,13 @@ html:not(.nib_hexagon) [data-variant="15"] {
   display: none;
 }
 
+#bga-zoom-wrapper {
+  direction: ltr;
+}
+
 .nib_gameArea {
+  direction: ltr;
+
   display: flex;
   flex-direction: column;
   align-items: center;
