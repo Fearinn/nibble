@@ -126,12 +126,6 @@ html:not(.nib_hexagon) [data-variant="15"] {
   padding: 0 4px;
 }
 
-.nib_winConWarn {
-  text-align: center;
-  margin: 0;
-  pointer-events: none;
-}
-
 .nib_main {
   display: flex;
   align-items: center;

@@ -86,29 +86,6 @@ define([
         },
         zoomLevels: [0.375, 0.5, 0.75, 1, 1.25, 1.5],
         smooth: true,
-        onZoomChange: (zoom) => {
-          const winConWarnElement = document.getElementById("nib_winConWarn");
-
-          if (zoom >= 1) {
-            winConWarnElement.style.removeProperty("transform");
-            winConWarnElement.style.removeProperty("margin");
-            return;
-          }
-
-          winConWarnElement.style.transform = `scale(${1 / zoom})`;
-
-          let margin = 8;
-
-          if (zoom <= 0.5) {
-            margin = 24;
-          }
-
-          if (zoom <= 0.375) {
-            margin = 44;
-          }
-
-          winConWarnElement.style.margin = `${margin}px 0`;
-        },
       });
 
       this.nib.managers.discs = new CardManager(this, {
@@ -450,8 +427,8 @@ define([
     },
 
     updateWinConWarn: function (playersNoInstaWin, majorityOwner) {
-      const winConWarnElement = document.getElementById("nib_winConWarn");
       warn = _("Both players can still get an instant win");
+      let args = {};
 
       if (majorityOwner) {
         if (playersNoInstaWin.length === 0) {
@@ -460,15 +437,14 @@ define([
               "You have the majority of majorities, but both players can still get an instant win!"
             );
           } else {
-            const playerName = this.nib.info.players[majorityOwner].name;
-            warn = this.format_string_recursive(
-              _(
-                "${player_name} has the majority of majorities, but both players can still get an instant win!"
-              ),
-              {
-                player_name: playerName,
-              }
+            warn = _(
+              "${player_name} has the majority of majorities, but both players can still get an instant win!"
             );
+
+            args = {
+              player_name:
+                this.bga.players.getFormattedPlayerName(majorityOwner),
+            };
           }
         }
 
@@ -477,49 +453,41 @@ define([
 
           for (const player_id in this.nib.info.players) {
             if (player_id != playersNoInstaWin[0]) {
-              playerName = this.nib.info.players[player_id].name;
+              playerName = this.bga.players.getFormattedPlayerName(player_id);
             }
           }
 
           if (playersNoInstaWin.includes(this.player_id)) {
-            warn = this.format_string_recursive(
-              _(
-                "You have the majority of majorities, but ${player_name} can still get an instant win!"
-              ),
-              {
-                player_name: playerName,
-              }
+            warn = _(
+              "You have the majority of majorities, but ${player_name} can still get an instant win!"
             );
+
+            args = {
+              player_name: playerName,
+            };
           } else if (!this.isSpectator) {
             const player_id = playersNoInstaWin[0];
-            const playerName = this.nib.info.players[player_id].name;
-            
-            warn = this.format_string_recursive(
-              _(
-                "${player_name} has the majority of majorities, but you can still get an instant win!"
-              ),
-              {
-                player_name: playerName,
-              }
+
+            warn = _(
+              "${player_name} has the majority of majorities, but you can still get an instant win!"
             );
+            args = {
+              player_name: this.bga.players.getFormattedPlayerName(player_id),
+            };
           } else {
             const player_id2 = playersNoInstaWin[0];
-            const playerName2 = this.nib.info.players[player_id2].name;
 
-            warn = this.format_string_recursive(
-              _(
-                "${player_name2} has the majority of majorities, but ${player_name} can still get an instant win!"
-              ),
-              {
-                player_name: playerName,
-                player_name2: playerName2,
-              }
+            warn = _(
+              "${player_name2} has the majority of majorities, but ${player_name} can still get an instant win!"
             );
+            args = {
+              player_name: playerName,
+              player_name2: this.bga.players.getFormattedPlayerName(player_id2),
+            };
           }
         }
 
-        winConWarnElement.style.backgroundColor = "yellow";
-        winConWarnElement.textContent = warn;
+        this.bga.gameArea.addWinConditionBanner(warn, args);
         return;
       }
 
@@ -527,7 +495,6 @@ define([
         warn = _(
           "Both players can no longer get an instant win. Go for the majorities!"
         );
-        winConWarnElement.style.backgroundColor = "yellow";
       }
 
       if (playersNoInstaWin.length === 1) {
@@ -535,26 +502,20 @@ define([
           warn = _(
             "You can no longer get an instant win. Go for the majorities!"
           );
-          winConWarnElement.style.backgroundColor = "red";
         } else {
           const player_id = playersNoInstaWin[0];
-          const player_name = this.nib.info.players[player_id].name;
 
           warn = this.format_string_recursive(
             _("${player_name} can no longer get an instant win"),
             {
               player_id: player_id,
-              player_name: player_name,
+              player_name: this.bga.players.getFormattedPlayerName(player_id),
             }
           );
-
-          if (!this.isSpectator) {
-            winConWarnElement.style.backgroundColor = "green";
-          }
         }
       }
 
-      winConWarnElement.textContent = warn;
+      this.bga.gameArea.addWinConditionBanner(warn);
     },
 
     ///////////////////////////////////////////////////

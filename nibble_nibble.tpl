@@ -11,7 +11,6 @@
 -->
 
 <div id="nib_gameArea" class="nib_gameArea">
-  <div id="nib_winConWarn" class="nib_winConWarn whiteblock"></div>
   <div id="nib_main" class="nib_main">
     <div id="nib_collections" class="nib_collections whiteblock"></div>
     <div id="nib_boardContainer" class="nib_boardContainer whiteblock">
