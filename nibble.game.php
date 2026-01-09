@@ -35,12 +35,6 @@ class Nibble extends Table
         );
     }
 
-    protected function getGameName()
-    {
-        // Used for translations and stuff. Please do not modify.
-        return "nibble";
-    }
-
     protected function setupNewGame($players, $options = [])
     {
         $gameinfos = $this->getGameinfos();
@@ -88,17 +82,14 @@ class Nibble extends Table
 
         $this->globals->set("collections", $collections);
 
-        // Activate first player (which is in general a good idea :) )
         $this->activeNextPlayer();
 
-        /************ End of the game initialization *****/
+        return 2;
     }
 
     protected function getAllDatas()
     {
         $gamedatas = [];
-
-        $current_player_id = $this->getCurrentPlayerId();    // !! We must only return informations visible by this player !!
 
         $sql = "SELECT player_id id, player_score score FROM player";
         $gamedatas = [

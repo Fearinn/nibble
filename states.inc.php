@@ -16,16 +16,6 @@
  */
 
 $machinestates = array(
-
-    // The initial state. Please do not modify.
-    1 => array(
-        "name" => "gameSetup",
-        "description" => "",
-        "type" => "manager",
-        "action" => "stGameSetup",
-        "transitions" => array("" => 2)
-    ),
-
     2 => array(
         "name" => "playerTurn",
         "description" => clienttranslate('${actplayer} must take one or more pieces'),
@@ -43,16 +33,5 @@ $machinestates = array(
         "action" => "stBetweenPlayers",
         "transitions" => array("nextPlayer" => 2, "gameEnd" => 99),
         "updateGameProgression" => true,
-    ),
-
-    // Final state.
-    // Please do not modify (and do not overload action/args methods).
-    99 => array(
-        "name" => "gameEnd",
-        "description" => clienttranslate("End of game"),
-        "type" => "manager",
-        "action" => "stGameEnd",
-        "args" => "argGameEnd"
     )
-
 );
