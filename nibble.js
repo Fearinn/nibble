@@ -563,40 +563,35 @@ define([
       this.bga.gameArea.addWinConditionBanner(log, args);
     },
 
-    // @Override
-    format_string_recursive: function (log, args) {
+    bgaFormatText: function (log, args) {
       try {
-        if (log && args && !args.processed) {
-          args.processed = true;
+        if (args.color_label && args.color_id) {
+          const color_id = args.color_id;
+          const color = this.nib.info.colors[color_id];
+          const backgroundColor = this.nib.info.darkColors.includes(color_id)
+            ? "white"
+            : "black";
 
-          if (args.color_label && args.color_id) {
-            const color_id = args.color_id;
-            const color = this.nib.info.colors[color_id];
-            const backgroundColor = this.nib.info.darkColors.includes(color_id)
-              ? "white"
-              : "black";
+          args.color_label = `<span class="nib_color-log" style="color: ${
+            color.name
+          }; background-color: ${backgroundColor}">${_(
+            args.color_label
+          )}</span>`;
+        }
 
-            args.color_label = `<span class="nib_color-log" style="color: ${
-              color.name
-            }; background-color: ${backgroundColor}">${_(
-              args.color_label
-            )}</span>`;
-          }
+        if (args.win_condition) {
+          const winCondition = this.format_string_recursive(
+            _(args.win_condition.log),
+            args.win_condition.args
+          );
 
-          if (args.win_condition) {
-            const winCondition = this.format_string_recursive(
-              _(args.win_condition.log),
-              args.win_condition.args
-            );
-
-            args.win_condition = `<span class="nib_highlight-log">${winCondition}</span>`;
-          }
+          args.win_condition = `<span class="nib_highlight-log">${winCondition}</span>`;
         }
       } catch (e) {
         console.error(log, args, "Exception thrown", e.stack);
       }
 
-      return this.inherited(arguments);
+      return { log, args };
     },
   });
 });
