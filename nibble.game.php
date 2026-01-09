@@ -96,12 +96,12 @@ class Nibble extends Table
 
     protected function getAllDatas()
     {
-        $result = [];
+        $gamedatas = [];
 
         $current_player_id = $this->getCurrentPlayerId();    // !! We must only return informations visible by this player !!
 
         $sql = "SELECT player_id id, player_score score FROM player";
-        $result = [
+        $gamedatas = [
             "version" => (int) $this->gamestate->table_globals[300],
             "is13Colors" => $this->is13Colors(),
             "isHexagon" => $this->isHexagon(),
@@ -117,7 +117,7 @@ class Nibble extends Table
             "majorityOwner" => $this->majorityOfMajorities(),
         ];
 
-        return $result;
+        return $gamedatas;
     }
 
     public function getGameProgression(): int
@@ -839,6 +839,7 @@ class Nibble extends Table
                 "announceWinner",
                 clienttranslate('${player_name} wins the game by ${win_condition}'),
                 [
+                    "i18n" => ["win_condition"],
                     "player_id" => $winner_id,
                     "player_name" => $this->getPlayerNameById($winner_id),
                     "win_condition" => [
@@ -848,7 +849,6 @@ class Nibble extends Table
                             "colors_nbr" => $this->adjacentColors(),
                         ],
                     ],
-                    "i18n" => ["win_condition"],
                 ]
             );
 

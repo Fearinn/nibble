@@ -427,6 +427,8 @@ define([
     },
 
     updateWinConWarn: function (playersNoInstaWin, majorityOwner) {
+      document.getElementById("bga-win-condition-banner")?.remove();
+
       warn = _("Both players can still get an instant win");
       let args = {};
 
@@ -551,13 +553,14 @@ define([
     },
 
     notif_updateWinConWarn: function (notif) {
-      const playersNoInstaWin = notif.args.playersNoInstaWin;
-      const majorityOwner = notif.args.majorityOwner;
+      const { playersNoInstaWin, majorityOwner } = notif.args;
       this.updateWinConWarn(playersNoInstaWin, majorityOwner);
     },
 
     notif_announceWinner: function (notif) {
-      document.getElementById("nib_winConWarn").remove();
+      const { log, args } = notif;
+      document.getElementById("bga-win-condition-banner")?.remove();
+      this.bga.gameArea.addWinConditionBanner(log, args);
     },
 
     // @Override
